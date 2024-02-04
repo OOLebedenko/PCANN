@@ -1,20 +1,31 @@
-from torch_geometric.data import Data, Dataset
-from glob import glob
-from tqdm import tqdm
-from scipy.spatial.distance import cdist
 import torch
 import pandas as pd
 import os
+import typing
+
+from multiprocessing import Process
+from typing import Union, List, Tuple, Callable, Optional
+
+from scipy.spatial.distance import cdist
+from torch_geometric.data import Data, Dataset
+
+from prepare import DimerStructure, PretrainedModel
+
+AnyPath = Union[str, bytes, os.PathLike]
 
 
-class BaseDataset(Dataset):
+class KdDataset(Dataset):
+
     def __init__(self,
-                 root,
-                 transform=None,
-                 pre_transform=None,
-                 pre_filter=None,
-                 raw_dirname="raw",
-                 processed_dirname='processed'
+                 root: AnyPath,
+                 pdb_fnames: Union[List, Tuple],
+                 raw_dirname: AnyPath,
+                 pretrained_model: PretrainedModel,
+                 interface_cutoff: float = 5.0,
+                 n_process: int = 1,
+                 transform: Optional[Callable] = None,
+                 pre_transform: Optional[Callable] = None,
+                 pre_filter: Optional[Callable] = None,
                  ):
         """
         :param root: where dataset should be stored. This folder is split into
@@ -28,7 +39,10 @@ class BaseDataset(Dataset):
                                   self.processed_dir = os.path.join(self.root, 'processed')
         """
         self.raw_dirname = raw_dirname
-        self.processed_dirname = processed_dirname
+        self.pdb_fnames = pdb_fnames
+        self.pretrained_model = pretrained_model
+        self.cutoff = interface_cutoff
+        self.n_process = n_process
         super().__init__(root, transform, pre_transform, pre_filter)
 
     @property
@@ -36,46 +50,39 @@ class BaseDataset(Dataset):
         return os.path.join(self.root, self.raw_dirname)
 
     @property
-    def processed_dir(self) -> str:
-        return os.path.join(self.root, self.processed_dirname)
-
-    @property
-    def raw_file_names(self):
+    def raw_file_names(self) -> List[str]:
         r"""The name of the files in the :obj:`self.raw_dir` folder that must
         be present in order to skip downloading."""
-        mol_csvs = [os.path.basename(file) for file in
-                    glob(os.path.join(self.raw_dir, "*.csv"))]
-        mol_csvs.sort()
-        return mol_csvs
+        return [f"{pdb_id}.meta" for pdb_id in self.pdb_ids]
 
     @property
-    def processed_file_names(self):
-        r"""The name of the files in the :obj:`self.processed_dir` folder that
-        must be present in order to skip processing."""
-        mols_pts = [os.path.basename(file) for file in
-                    glob(os.path.join(self.processed_dir, "*.pt"))
-                    if not os.path.basename(file).startswith("pre")
-                    ]
-        mols_pts.sort()
-        return mols_pts
+    def raw_paths(self) -> List[str]:
+        return [os.path.join(self.raw_dir, fname)
+                for fname in self.pdb_fnames
+                if not os.path.exists(
+                os.path.join(self.pretrained_model.name, f"{os.path.basename(fname).split('.')[0]}.pt"))
+                ]
 
-    def len(self):
-        return len(self.processed_file_names)
+    @property
+    def processed_paths(self) -> List[str]:
+        return [os.path.join(self.pretrained_model.name, f"{os.path.basename(fname).split('.')[0]}.pt")
+                for fname in self.pdb_fnames
+                ]
 
-    def get(self, idx):
-        r"""Gets the data object at index :obj:`idx`."""
-        NotImplemented
+    def __process(self, raw_paths) -> None:
+        for raw_path in raw_paths:
+            st = DimerStructure(raw_path)
+            st.clean()
+            st.renumber_residues()
 
-    def process(self):
-        r"""Processes the dataset to the :obj:`self.processed_dir` folder."""
-        for raw_file_path in tqdm(self.raw_paths):
-            mol_df = pd.read_csv(raw_file_path)
             # get node features
-            node_features = self._get_node_features(mol_df)
+            node_features = self._get_node_features(st)
+
             # get edge features
-            edge_features = self._get_edge_features(mol_df)
+            edge_features = self._get_edge_features(st)
+
             # get adjacency info
-            edge_indexes = self._get_adjacency_info(mol_df)
+            edge_indexes = self._get_adjacency_info(st)
 
             # create data object
             data = Data(x=node_features,
@@ -83,60 +90,61 @@ class BaseDataset(Dataset):
                         edge_attr=edge_features,
                         )
 
-            molname = os.path.basename(raw_file_path).split(".")[0]
-            torch.save(data, os.path.join(self.processed_dir, f"{molname}.pt"))
+            torch.save(data, os.path.join(self.pretrained_model.name, f"{st.name}.pt"))
 
-    def _get_node_features(self, mol):
-        """
-        This will return a matrix / 2d array of the shape
-        [number of nodes, node features size]
-        """
-        NotImplemented
+    def process(self) -> None:
+        processes = []
+        r"""Processes the dataset to the :obj:`self.processed_dir` folder."""
+        os.makedirs(self.pretrained_model.name, exist_ok=True)
+        chunk_size = len(self.raw_paths) // self.n_process
+        for ind_1, ind_2 in [(chunk_size * ind, chunk_size * ind + chunk_size) for ind in
+                             range(self.n_process)]:
+            p = Process(
+                target=self.__process, kwargs=(
+                    {"raw_paths": self.raw_paths[ind_1:ind_2],
+                     }
+                )
+            )
+            p.start()
+            processes.append(p)
 
-    def _get_edge_features(self, mol):
-        """
-        This will return a matrix / 2d array of the shape
-        [number of edges, edge features size]
-        """
-        NotImplemented
+        for p in processes:
+            p.join()
 
-    def _get_adjacency_info(self, mol):
-        edges = [[i, j] for i in range(mol.shape[0]) for j in range(mol.shape[0])]
-        return torch.tensor(edges, dtype=torch.long).t().contiguous()
-
-
-class KdDataset(BaseDataset):
-
-    def get(self, idx):
+    def get(self, idx) -> Tuple[torch.Tensor, torch.Tensor]:
         r"""Gets the data object at index :obj:`idx`."""
         kd = pd.read_csv(os.path.join(self.root, 'log_kd.csv'))
-        molfile_pt = self.processed_file_names[idx]
+        molfile_pt = self.processed_paths[idx]
 
-        target = kd["log_kd"][kd["complex"] == molfile_pt.split("pdb_")[-1].split(".pt")[0]].values
+        target = kd["target"][kd["pdb_id"] == os.path.basename(molfile_pt).split(".pt")[0]].values
         target = torch.from_numpy(target).float()
-
-        data = torch.load(os.path.join(self.processed_dir, molfile_pt))
+        data = torch.load(os.path.join(molfile_pt))
 
         return data, target
 
-    def _get_node_features(self, mol):
+    def len(self) -> int:
+        return len(self.processed_paths)
+
+    def _get_node_features(self, st) -> torch.Tensor:
         """
         This will return a matrix / 2d array of the shape
         [number of nodes, node features size]
         """
-        embeddings_strs = mol['embedding'].values
-        embeddings = []
-        for string in embeddings_strs:
-            embeddings.append([float(s) for s in string.split()])
+        interface_rids = [residue.seqid.num for residue in st.select_interface(self.cutoff).residues()]
+        return torch.tensor(st.pretrained_embedding(self.pretrained_model)[interface_rids], dtype=torch.float)
 
-        features = torch.tensor(embeddings, dtype=torch.float)
-        return features
-
-    def _get_edge_features(self, mol):
+    def _get_edge_features(self, st) -> torch.Tensor:
         """
         This will return a matrix / 2d array of the shape
         [number of edges, edge features size]
         """
-        xyz = mol[['x', 'y', 'z']].values
-        features = cdist(xyz, xyz).reshape(-1, 1)
+        st.select_interface(self.cutoff).select_ca_atoms()
+        features = cdist(st.coords, st.coords).reshape(-1, 1)
+        st.to_original()
         return torch.tensor(features, dtype=torch.float)
+
+    def _get_adjacency_info(self, st):
+        st.select_interface(self.cutoff).select_ca_atoms()
+        edges = [[i, j] for i in range(st.coords.shape[0]) for j in range(st.coords.shape[0])]
+        st.to_original()
+        return torch.tensor(edges, dtype=torch.long).t().contiguous()
