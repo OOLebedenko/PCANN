@@ -145,3 +145,33 @@ class DimerStructure:
     @property
     def name(self):
         return self.st.name.split(".")[0]
+
+
+class PretrainedModel:
+    def __init__(self,
+                 path_to_esm_dir: AnyPath,
+                 name: str):
+        self.path_to_esm_dir = path_to_esm_dir
+        self.name = name
+
+    def _build_command_template(self,
+                                path_to_esm_dir: AnyPath) -> str:
+        raise NotImplementedError
+
+    def predict(self,
+                st: "DimerStructure") -> Dict[str, np.array]:
+        embeddings = {}
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            with open(os.path.join(tmp_dir, 'tmp.fasta'), "w") as tmp_fasta_file:
+                for chain_name, sequence in st.sequence_by_chains.items():
+                    tmp_fasta_file.write(f">{chain_name}")
+                    tmp_fasta_file.write("\n")
+                    tmp_fasta_file.write(sequence)
+                    tmp_fasta_file.write("\n")
+            command_template = self._build_command_template(self.path_to_esm_dir)
+            subprocess.call(command_template.format(fasta_file=os.path.join(tmp_dir, 'tmp.fasta'),
+                                                    outdir=tmp_dir).split())
+            for chain_name in st.sequence_by_chains.keys():
+                embeddings[chain_name] = next(
+                    iter(torch.load(os.path.join(tmp_dir, f"{chain_name}.pt"))["representations"].values())).numpy()
+        return embeddings
