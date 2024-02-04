@@ -10,7 +10,7 @@ import torch
 from typing import Iterator, List, Tuple, Union, Dict
 from scipy.spatial import cKDTree
 
-AnyPath = typing.Union[str, bytes, os.PathLike]
+AnyPath = Union[str, bytes, os.PathLike]
 
 
 def convert_3to1(list_of_aa: Union[List, Tuple]):
@@ -175,3 +175,13 @@ class PretrainedModel:
                 embeddings[chain_name] = next(
                     iter(torch.load(os.path.join(tmp_dir, f"{chain_name}.pt"))["representations"].values())).numpy()
         return embeddings
+
+
+class EsmPretrainedModel(PretrainedModel):
+
+    def _build_command_template(self,
+                                path_to_esm_dir: AnyPath) -> str:
+        os.putenv("PYTHONPATH", os.pathsep.join([os.getenv("PYTHONPATH", ""), path_to_esm_dir]))
+        command_template = f"python3 {os.path.join(path_to_esm_dir, 'scripts', 'extract.py')} " \
+            f"{self.name} {{fasta_file}} {{outdir}} --include per_tok"
+        return command_template
