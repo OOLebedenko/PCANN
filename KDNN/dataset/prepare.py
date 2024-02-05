@@ -47,10 +47,19 @@ class DimerStructure:
                 for residue in chain:
                     yield model, chain, residue
 
+    def remove_hetatm(self):
+        for _, _, residue in self.iterate_over_residues():
+            if residue.het_flag == "A":
+                residue.flag = "A"
+        selection = gemmi.Selection('/1').set_residue_flags('A')
+        selection.remove_not_selected(self.st)
+        return self
+
     def clean(self) -> "DimerStructure":
         self.st.remove_alternative_conformations()
         self.st.remove_ligands_and_waters()
         self.st.remove_empty_chains()
+        self.remove_hetatm()
         return self
 
     def clone(self) -> "DimerStructure":
@@ -183,5 +192,5 @@ class EsmPretrainedModel(PretrainedModel):
                                 path_to_esm_dir: AnyPath) -> str:
         os.putenv("PYTHONPATH", os.pathsep.join([os.getenv("PYTHONPATH", ""), path_to_esm_dir]))
         command_template = f"python3 {os.path.join(path_to_esm_dir, 'scripts', 'extract.py')} " \
-            f"{self.name} {{fasta_file}} {{outdir}} --include per_tok"
+                           f"{self.name} {{fasta_file}} {{outdir}} --include per_tok"
         return command_template
