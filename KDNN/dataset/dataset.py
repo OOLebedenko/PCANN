@@ -1,7 +1,6 @@
 import torch
 import pandas as pd
 import os
-import typing
 
 from multiprocessing import Process
 from typing import Union, List, Tuple, Callable, Optional
@@ -9,7 +8,7 @@ from typing import Union, List, Tuple, Callable, Optional
 from scipy.spatial.distance import cdist
 from torch_geometric.data import Data, Dataset
 
-from prepare import DimerStructure, PretrainedModel
+from KDNN.dataset.prepare import DimerStructure, PretrainedModel
 
 AnyPath = Union[str, bytes, os.PathLike]
 

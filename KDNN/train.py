@@ -4,19 +4,19 @@ import os
 import torch
 import torch.nn.functional as F
 
-import dataset as module_dataset
-import model.model as module_arch
-import utils.metric as module_metric
+import KDNN.dataset as module_dataset
+import KDNN.model.model as module_arch
+import KDNN.utils.metric as module_metric
 
 from datetime import datetime
 from pathlib import Path
 
-from utils.setup import setup_data_loaders, setup_split_data_loaders
-from utils.setup import SetupRun
-from utils.logging import SetupLogger
-from utils.util import read_json
-from trainer.trainer import Trainer
-from utils.visualization import TensorboardWriter
+from KDNN.utils.setup import setup_data_loaders, setup_split_data_loaders
+from KDNN.utils.setup import SetupRun
+from KDNN.utils.logging import SetupLogger
+from KDNN.utils.util import read_json
+from KDNN.trainer.trainer import Trainer
+from KDNN.utils.visualization import TensorboardWriter
 
 
 def run_training(run_setup: SetupRun,
