@@ -131,7 +131,7 @@ class KdDataset(Dataset):
         This will return a matrix / 2d array of the shape
         [number of nodes, node features size]
         """
-        interface_rids = [residue.seqid.num for residue in st.select_interface(self.cutoff).residues()]
+        interface_rids = [residue.seqid.num - 1 for residue in st.select_interface(self.cutoff).residues()]
         return torch.tensor(st.pretrained_embedding(self.pretrained_model)[interface_rids], dtype=torch.float)
 
     def _get_edge_features(self, st) -> torch.Tensor:
