@@ -19,6 +19,7 @@ class KdDataset(Dataset):
                  root: AnyPath,
                  pdb_fnames: Union[List, Tuple],
                  raw_dirname: AnyPath,
+                 target_csv_fname: AnyPath,
                  pretrained_model: PretrainedModel,
                  interface_cutoff: float = 5.0,
                  n_process: int = 1,
@@ -39,6 +40,7 @@ class KdDataset(Dataset):
         """
         self.raw_dirname = raw_dirname
         self.pdb_fnames = pdb_fnames
+        self.target_csv_fname = target_csv_fname
         self.pretrained_model = pretrained_model
         self.cutoff = interface_cutoff
         self.n_process = n_process
@@ -112,7 +114,7 @@ class KdDataset(Dataset):
 
     def get(self, idx) -> Tuple[torch.Tensor, torch.Tensor]:
         r"""Gets the data object at index :obj:`idx`."""
-        kd = pd.read_csv(os.path.join(self.root, 'log_kd.csv'))
+        kd = pd.read_csv(os.path.join(self.root, self.target_csv_fname))
         molfile_pt = self.processed_paths[idx]
 
         target = kd["target"][kd["pdb_id"] == os.path.basename(molfile_pt).split(".pt")[0]].values
