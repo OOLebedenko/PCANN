@@ -67,9 +67,9 @@ class DimerStructure:
     def clean(self) -> "DimerStructure":
         self.st.remove_alternative_conformations()
         self.st.remove_ligands_and_waters()
-        self.st.remove_empty_chains()
         self.remove_hetatm()
         self.remove_unk_residues()
+        self.st.remove_empty_chains()
         return self
 
     def copy(self) -> "DimerStructure":
