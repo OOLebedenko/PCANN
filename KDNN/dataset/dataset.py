@@ -73,8 +73,7 @@ class KdDataset(Dataset):
     def __process(self, raw_paths) -> None:
         for raw_path in raw_paths:
             st = DimerStructure(raw_path)
-            st.clean()
-            st.renumber_residues()
+            st.clean().renumber_residues()
 
             # get node features
             node_features = self._get_node_features(st)
@@ -131,21 +130,23 @@ class KdDataset(Dataset):
         This will return a matrix / 2d array of the shape
         [number of nodes, node features size]
         """
-        interface_rids = [residue.seqid.num - 1 for residue in st.select_interface(self.cutoff).residues()]
-        return torch.tensor(st.pretrained_embedding(self.pretrained_model)[interface_rids], dtype=torch.float)
+        st_copy = st.copy()
+        embeddings = st_copy.pretrained_embedding(self.pretrained_model)
+        interface_rids = [residue.seqid.num - 1 for residue in st_copy.select_interface(self.cutoff).residues()]
+        return torch.tensor(embeddings[interface_rids], dtype=torch.float)
 
     def _get_edge_features(self, st) -> torch.Tensor:
         """
         This will return a matrix / 2d array of the shape
         [number of edges, edge features size]
         """
-        st.select_interface(self.cutoff).select_ca_atoms()
-        features = cdist(st.coords, st.coords).reshape(-1, 1)
-        st.to_original()
+        st_copy = st.copy()
+        st_copy.select_interface(self.cutoff).select_ca_atoms()
+        features = cdist(st_copy.coords, st_copy.coords).reshape(-1, 1)
         return torch.tensor(features, dtype=torch.float)
 
     def _get_adjacency_info(self, st):
-        st.select_interface(self.cutoff).select_ca_atoms()
-        edges = [[i, j] for i in range(st.coords.shape[0]) for j in range(st.coords.shape[0])]
-        st.to_original()
+        st_copy = st.copy()
+        st_copy.select_interface(self.cutoff).select_ca_atoms()
+        edges = [[i, j] for i in range(st_copy.coords.shape[0]) for j in range(st_copy.coords.shape[0])]
         return torch.tensor(edges, dtype=torch.long).t().contiguous()

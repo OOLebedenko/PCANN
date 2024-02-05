@@ -7,6 +7,7 @@ import gemmi
 import numpy as np
 import torch
 
+from copy import copy
 from typing import Iterator, List, Tuple, Union, Dict
 from scipy.spatial import cKDTree
 
@@ -71,11 +72,8 @@ class DimerStructure:
         self.remove_unk_residues()
         return self
 
-    def clone(self) -> "DimerStructure":
-        return self.clone()
-
-    def to_original(self) -> "DimerStructure":
-        return self._copy
+    def copy(self) -> "DimerStructure":
+        return copy(self)
 
     def select_ca_atoms(self) -> "DimerStructure":
         self.st = gemmi.Selection('CA[C]').copy_structure_selection(self.st)
