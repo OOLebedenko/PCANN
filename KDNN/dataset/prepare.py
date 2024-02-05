@@ -166,9 +166,11 @@ class DimerStructure:
 class PretrainedModel:
     def __init__(self,
                  path_to_esm_dir: AnyPath,
-                 name: str):
+                 name: str,
+                 use_gpu: bool = False):
         self.path_to_esm_dir = path_to_esm_dir
         self.name = name
+        self.use_gpu = use_gpu
 
     def _build_command_template(self,
                                 path_to_esm_dir: AnyPath) -> str:
@@ -197,7 +199,11 @@ class EsmPretrainedModel(PretrainedModel):
 
     def _build_command_template(self,
                                 path_to_esm_dir: AnyPath) -> str:
+        if self.use_gpu:
+            device_flag = ""
+        else:
+            device_flag = "--nogpu"
         os.putenv("PYTHONPATH", os.pathsep.join([os.getenv("PYTHONPATH", ""), path_to_esm_dir]))
         command_template = f"python3 {os.path.join(path_to_esm_dir, 'scripts', 'extract.py')} " \
-                           f"{self.name} {{fasta_file}} {{outdir}} --include per_tok"
+                           f"{self.name} {{fasta_file}} {{outdir}} --include per_tok {device_flag}"
         return command_template
