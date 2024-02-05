@@ -140,9 +140,9 @@ class DimerStructure:
     @property
     def sequence_by_chains(self):
         sequences = {}
-        for ind, entity in enumerate(self.st.entities, 1):
-            if entity.entity_type.name == "Polymer":
-                sequences[entity.name] = convert_3to1(entity.full_sequence)
+        for chain in self.st[0]:
+            three_letter_seq = [residue.name for residue in chain if residue.name]
+            sequences[chain.name] = convert_3to1(three_letter_seq)
         return sequences
 
     @property
