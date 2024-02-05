@@ -55,11 +55,20 @@ class DimerStructure:
         selection.remove_not_selected(self.st)
         return self
 
+    def remove_unk_residues(self) -> "DimerStructure":
+        for _, _, residue in self.iterate_over_residues():
+            if residue.name == "UNK":
+                residue.flag = "U"
+        selection = gemmi.Selection('/1').set_residue_flags('U')
+        selection.remove_selected(self.st)
+        return self
+
     def clean(self) -> "DimerStructure":
         self.st.remove_alternative_conformations()
         self.st.remove_ligands_and_waters()
         self.st.remove_empty_chains()
         self.remove_hetatm()
+        self.remove_unk_residues()
         return self
 
     def clone(self) -> "DimerStructure":
