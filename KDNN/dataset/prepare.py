@@ -29,7 +29,7 @@ class DimerStructure:
 
     def __init__(self,
                  pdb_file: AnyPath) -> None:
-        self.st = gemmi.read_pdb(str(pdb_file), split_chain_on_ter=True)
+        self.st = gemmi.read_pdb(pdb_file, split_chain_on_ter=True)
         self.st.setup_entities()
         self._copy = self.st
         self.pretrained_embeddings = None
@@ -47,7 +47,7 @@ class DimerStructure:
                 for residue in chain:
                     yield model, chain, residue
 
-    def remove_hetatm(self):
+    def remove_hetatm(self) -> "DimerStructure":
         for _, _, residue in self.iterate_over_residues():
             if residue.het_flag == "A":
                 residue.flag = "A"
