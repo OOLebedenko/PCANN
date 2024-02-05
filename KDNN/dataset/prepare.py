@@ -123,12 +123,11 @@ class DimerStructure:
                              pretrained_model: "PretrainedModel"
                              ):
         _embeddings = pretrained_model.predict(self)
-        for entity in self.st.entities:
-            if entity.entity_type.name == "Polymer":
+        for chain in self.chains:
                 if self.pretrained_embeddings is None:
-                    self.pretrained_embeddings = _embeddings[entity.name]
+                    self.pretrained_embeddings = _embeddings[chain.name]
                 else:
-                    self.pretrained_embeddings = np.concatenate([self.pretrained_embeddings, _embeddings[entity.name]],
+                    self.pretrained_embeddings = np.concatenate([self.pretrained_embeddings, _embeddings[chain.name]],
                                                                 axis=0)
         return self.pretrained_embeddings
 
@@ -156,7 +155,7 @@ class DimerStructure:
 
     @property
     def chains(self):
-        return list(self.st.model)
+        return list(self.st[0])
 
     @property
     def name(self):
