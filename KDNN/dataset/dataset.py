@@ -16,11 +16,11 @@ AnyPath = Union[str, bytes, os.PathLike]
 class KdDataset(Dataset):
 
     def __init__(self,
-                 root: AnyPath,
-                 pdb_fnames: Union[List, Tuple],
-                 raw_dirname: AnyPath,
-                 target_csv_fname: AnyPath,
+                 path_to_pdb_dir: AnyPath,
+                 path_to_target_csv: AnyPath,
                  pretrained_model: PretrainedModel,
+                 pdb_fname_format="{}.pdb1.gz",
+                 root: AnyPath = ".",
                  interface_cutoff: float = 5.0,
                  n_process: int = 1,
                  transform: Optional[Callable] = None,
@@ -38,9 +38,9 @@ class KdDataset(Dataset):
         :param processed_dirname: override the 'processed' name in base class
                                   self.processed_dir = os.path.join(self.root, 'processed')
         """
-        self.raw_dirname = raw_dirname
-        self.pdb_fnames = pdb_fnames
-        self.target_csv_fname = target_csv_fname
+        self.raw_dirname = path_to_pdb_dir
+        self.df_kd = pd.read_csv(path_to_target_csv)
+        self.pdb_fnames = [pdb_fname_format.format(pdb_id) for pdb_id in self.df_kd["pdb_id"].values]
         self.pretrained_model = pretrained_model
         self.cutoff = interface_cutoff
         self.n_process = n_process
@@ -113,10 +113,9 @@ class KdDataset(Dataset):
 
     def get(self, idx) -> Tuple[torch.Tensor, torch.Tensor]:
         r"""Gets the data object at index :obj:`idx`."""
-        kd = pd.read_csv(os.path.join(self.root, self.target_csv_fname))
         molfile_pt = self.processed_paths[idx]
 
-        target = kd["target"][kd["pdb_id"] == os.path.basename(molfile_pt).split(".pt")[0]].values
+        target = self.df_kd["target"][self.df_kd["pdb_id"] == os.path.basename(molfile_pt).split(".pt")[0]].values
         target = torch.from_numpy(target).float()
         data = torch.load(os.path.join(molfile_pt))
 
