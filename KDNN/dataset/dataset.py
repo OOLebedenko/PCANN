@@ -98,8 +98,6 @@ class KdDataset(Dataset):
 
     def process(self) -> None:
         r"""Processes the dataset to the :obj:`self.processed_dir` folder."""
-        os.makedirs(self.pretrained_model.name, exist_ok=True)
-
         not_processed_raw_paths = [raw_path for raw_path, processed_path
                                    in zip(self.raw_paths, self.processed_paths)
                                    if not os.path.exists(processed_path)
