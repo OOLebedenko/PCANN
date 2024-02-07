@@ -1,9 +1,9 @@
 import numpy as np
 import torch
 
-from utils.logging import logged, SetupLogger, log_train_epoch, log_valid_epoch, log_train_batch, \
+from KDNN.utils.logging import logged, SetupLogger, log_train_epoch, log_valid_epoch, log_train_batch, \
     log_resume_checkpoint_before, log_resume_checkpoint_after
-from utils.util import MetricTracker
+from KDNN.utils.util import MetricTracker
 
 logger = SetupLogger.get_logger(__name__)
 

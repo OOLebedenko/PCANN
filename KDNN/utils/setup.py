@@ -10,7 +10,7 @@ from torch_geometric.data import Dataset
 from torch_geometric.loader import DataLoader
 from torch.utils.data.sampler import SubsetRandomSampler
 
-from utils.util import write_json, wrapped_partial
+from KDNN.utils.util import write_json, wrapped_partial
 
 
 class SetupRun:
