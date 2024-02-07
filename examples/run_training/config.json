@@ -34,6 +34,15 @@
       "pdb_fname_format": "{}.pdb1"
     }
   },
+  "dataset_test": {
+    "type": "KdDataset",
+    "args": {
+      "root": "../create_graph_dataset/",
+      "path_to_pdb_dir": "pdb",
+      "path_to_target_csv": "log_kd_test.csv",
+      "pdb_fname_format": "{}.pdb1"
+    }
+  },
   "dataset": {},
   "dataset_transforms": {},
   "dataloader": {
