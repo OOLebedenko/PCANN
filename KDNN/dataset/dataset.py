@@ -63,7 +63,7 @@ class KdDataset(Dataset):
 
     @property
     def processed_dir(self) -> str:
-        return os.path.join(self.root, self.pretrained_model.name)
+        return os.path.join(self.root, f"interface_cutoff_{self.cutoff}", self.pretrained_model.name)
 
     @property
     def processed_file_names(self) -> List[str]:
@@ -94,7 +94,7 @@ class KdDataset(Dataset):
                         edge_attr=edge_features,
                         )
 
-            torch.save(data, os.path.join(self.pretrained_model.name, f"{st.name}.pt"))
+            torch.save(data, os.path.join(self.processed_dir, f"{st.name}.pt"))
 
     def process(self) -> None:
         r"""Processes the dataset to the :obj:`self.processed_dir` folder."""
