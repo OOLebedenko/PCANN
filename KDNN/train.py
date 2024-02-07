@@ -85,21 +85,15 @@ def run_training(run_setup: SetupRun,
     trainer.train()
 
 
-def main(run_dir,
-         config,
+def main(config,
          log_config):
     # read configurations, hyperparameters for training and logging
     config = read_json(config)
     log_config = read_json(log_config)
 
     # set directories where trained model and log will be saved.
-    outdir = Path(os.path.join(config['outdir'], config['name']))
-    if not run_dir:
-        run_dir = datetime.now().strftime(r'%m%d_%H%M%S')
-    else:
-        run_dir = run_dir
-    checkpoint_dir = os.path.join(outdir, "checkpoint", run_dir)
-    log_dir = os.path.join(outdir, "log", run_dir)
+    checkpoint_dir = os.path.join("experiments", config['outdir'], "checkpoint")
+    log_dir = os.path.join("experiments", config['outdir'], "log")
 
     run_setup = SetupRun(config=config,
                          checkpoint_dir=checkpoint_dir)
@@ -130,5 +124,4 @@ if __name__ == '__main__':
 
     main(config=args.config,
          log_config=args.log_config,
-         run_dir=args.run_dir
          )
