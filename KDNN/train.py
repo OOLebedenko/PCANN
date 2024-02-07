@@ -31,8 +31,16 @@ def run_training(run_setup: SetupRun,
         "Please, specify 1) dataset in config with validation_split parameter or \n 2) dataset_train and dataset_valid"
 
     if run_setup["dataset_train"] and run_setup["dataset_valid"]:
-        dataset_train = run_setup.init_obj('dataset_train', module_dataset)
-        dataset_valid = run_setup.init_obj('dataset_valid', module_dataset)
+        pretrained_model = run_setup.init_obj("pretrained_model", module_dataset)
+
+        dataset_train = run_setup.init_obj(name='dataset_train',
+                                           module=module_dataset,
+                                           pretrained_model=pretrained_model)
+
+        dataset_valid = run_setup.init_obj('dataset_valid',
+                                           module_dataset,
+                                           pretrained_model=pretrained_model
+                                           )
         logger.info(dataset_train)
         logger.info(dataset_valid)
 
