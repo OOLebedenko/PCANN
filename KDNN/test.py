@@ -99,7 +99,7 @@ def main(config,
     vizualizer_setup = TensorboardWriter(log_dir, log_setup, cfg_trainer['tensorboard'])
 
     # run training process
-    run_testing(run_setup, log_setup, vizualizer_setup=vizualizer_setup, device=config['device'],
+    run_testing(run_setup, log_setup, vizualizer_setup=vizualizer_setup, device="cpu",
                 dataset_type=dataset_type)
 
 
