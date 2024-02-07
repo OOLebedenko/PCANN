@@ -39,8 +39,8 @@ class KdDataset(Dataset):
                                   self.processed_dir = os.path.join(self.root, 'processed')
         """
         self.raw_dirname = path_to_pdb_dir
+        self.raw_file_format = pdb_fname_format
         self.df_kd = pd.read_csv(path_to_target_csv)
-        self.pdb_fnames = [pdb_fname_format.format(pdb_id) for pdb_id in self.df_kd["pdb_id"].values]
         self.pretrained_model = pretrained_model
         self.cutoff = interface_cutoff
         self.n_process = n_process
@@ -54,21 +54,25 @@ class KdDataset(Dataset):
     def raw_file_names(self) -> List[str]:
         r"""The name of the files in the :obj:`self.raw_dir` folder that must
         be present in order to skip downloading."""
-        return [f"{pdb_id}.meta" for pdb_id in self.pdb_ids]
+        return [self.raw_file_format.format(pdb_id) for pdb_id in self.df_kd["pdb_id"].values]
 
     @property
     def raw_paths(self) -> List[str]:
-        return [os.path.join(self.raw_dir, fname)
-                for fname in self.pdb_fnames
-                if not os.path.exists(
-                os.path.join(self.pretrained_model.name, f"{os.path.basename(fname).split('.')[0]}.pt"))
-                ]
+        return [os.path.join(self.raw_dir, raw_fname)
+                for raw_fname in self.raw_file_names]
+
+    @property
+    def processed_dir(self) -> str:
+        return os.path.join(self.root, self.pretrained_model.name)
+
+    @property
+    def processed_file_names(self) -> List[str]:
+        return [f"{pdb_id}.pt" for pdb_id in self.df_kd["pdb_id"].values]
 
     @property
     def processed_paths(self) -> List[str]:
-        return [os.path.join(self.pretrained_model.name, f"{os.path.basename(fname).split('.')[0]}.pt")
-                for fname in self.pdb_fnames
-                ]
+        return [os.path.join(self.processed_dir, processed_fname)
+                for processed_fname in self.processed_file_names]
 
     def __process(self, raw_paths) -> None:
         for raw_path in raw_paths:
@@ -93,15 +97,21 @@ class KdDataset(Dataset):
             torch.save(data, os.path.join(self.pretrained_model.name, f"{st.name}.pt"))
 
     def process(self) -> None:
-        processes = []
         r"""Processes the dataset to the :obj:`self.processed_dir` folder."""
         os.makedirs(self.pretrained_model.name, exist_ok=True)
-        chunk_size = len(self.raw_paths) // self.n_process
+
+        not_processed_raw_paths = [raw_path for raw_path, processed_path
+                                   in zip(self.raw_paths, self.processed_paths)
+                                   if not os.path.exists(processed_path)
+                                   ]
+
+        chunk_size = len(not_processed_raw_paths) // self.n_process
+        processes = []
         for ind_1, ind_2 in [(chunk_size * ind, chunk_size * ind + chunk_size) for ind in
                              range(self.n_process)]:
             p = Process(
                 target=self.__process, kwargs=(
-                    {"raw_paths": self.raw_paths[ind_1:ind_2],
+                    {"raw_paths": not_processed_raw_paths[ind_1:ind_2],
                      }
                 )
             )
