@@ -6,8 +6,7 @@ from KDNN.dataset import KdDataset, EsmPretrainedModel
 # and fill the esm_path according to your directory tree
 #######################################################################################################################
 
-# esm_path = ""
-esm_path = "/home/olebedenko/Projects/kd_pred/"
+esm_path = "{ENTER_YOUR_PATH}"
 
 path_to_target_csv = "log_kd.csv"  # basename for csv with target data
 path_to_pdb_dir = "pdb"  # name of raw pdb directory
