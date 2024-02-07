@@ -8,9 +8,6 @@ import KDNN.dataset as module_dataset
 import KDNN.model.model as module_arch
 import KDNN.utils.metric as module_metric
 
-from datetime import datetime
-from pathlib import Path
-
 from KDNN.utils.setup import setup_data_loaders, setup_split_data_loaders
 from KDNN.utils.setup import SetupRun
 from KDNN.utils.logging import SetupLogger

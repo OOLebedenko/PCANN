@@ -124,11 +124,11 @@ class DimerStructure:
                              ):
         _embeddings = pretrained_model.predict(self)
         for chain in self.chains:
-                if self.pretrained_embeddings is None:
-                    self.pretrained_embeddings = _embeddings[chain.name]
-                else:
-                    self.pretrained_embeddings = np.concatenate([self.pretrained_embeddings, _embeddings[chain.name]],
-                                                                axis=0)
+            if self.pretrained_embeddings is None:
+                self.pretrained_embeddings = _embeddings[chain.name]
+            else:
+                self.pretrained_embeddings = np.concatenate([self.pretrained_embeddings, _embeddings[chain.name]],
+                                                            axis=0)
         return self.pretrained_embeddings
 
     def write_pdb(self, path: AnyPath):
