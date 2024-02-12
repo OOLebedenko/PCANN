@@ -66,6 +66,7 @@ class KdModel(BaseModel):
                  node_feature_dim: Union[int, Tuple[int, int]],
                  node_embedding_dim: int,
                  edge_feature_dim: int,
+                 edge_hidden_dim: int,
                  num_layers: int = 4,
                  heads: int = 1,
                  concat: bool = False,
@@ -95,14 +96,14 @@ class KdModel(BaseModel):
 
         self.convs.append(MetaLayer(
             EdgeConvLayer(node_feature_dim=node_feature_dim,
-                          edge_feature_dim_in=edge_feature_dim,
-                          edge_hidden_dim=node_embedding_dim,
-                          edge_feature_dim_out=node_embedding_dim,
+                          edge_feature_dim_in=1,
+                          edge_hidden_dim=edge_hidden_dim,
+                          edge_feature_dim_out=edge_feature_dim,
                           residuals=self.residuals_edges),
             GATConv(in_channels=node_feature_dim,
                     out_channels=node_embedding_dim,
                     concat=concat,
-                    edge_dim=node_embedding_dim,
+                    edge_dim=edge_feature_dim,
                     heads=heads,
                     negative_slope=negative_slope,
                     dropout=dropout,
@@ -110,21 +111,20 @@ class KdModel(BaseModel):
                     fill_value=fill_value,
                     bias=bias,
                     **kwargs)
-
         ))
 
         for _ in range(self.num_layers - 1):
 
             meta = MetaLayer(
                 EdgeConvLayer(node_feature_dim=node_embedding_dim,
-                              edge_feature_dim_in=node_embedding_dim,
-                              edge_hidden_dim=node_embedding_dim,
-                              edge_feature_dim_out=node_embedding_dim,
+                              edge_feature_dim_in=edge_feature_dim,
+                              edge_hidden_dim=edge_hidden_dim,
+                              edge_feature_dim_out=edge_feature_dim,
                               residuals=self.residuals_edges),
                 GATConv(in_channels=node_embedding_dim,
                         out_channels=node_embedding_dim,
                         concat=concat,
-                        edge_dim=node_embedding_dim,
+                        edge_dim=edge_feature_dim,
                         fill_value=0))
 
             self.convs.append(meta)
