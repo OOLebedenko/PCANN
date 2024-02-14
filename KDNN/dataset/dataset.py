@@ -1,5 +1,6 @@
 import torch
 import pandas as pd
+import numpy as np
 import os
 
 from multiprocessing import Process
@@ -63,7 +64,7 @@ class KdDataset(Dataset):
 
     @property
     def processed_dir(self) -> str:
-        return os.path.join(self.root, f"interface_cutoff_{self.cutoff}", self.pretrained_model.name)
+        return os.path.join("../../experiments", f"interaction_interface_cutoff_{self.cutoff}", self.pretrained_model.name)
 
     @property
     def processed_file_names(self) -> List[str]:
@@ -149,11 +150,17 @@ class KdDataset(Dataset):
         """
         st_copy = st.copy()
         st_copy.select_interface(self.cutoff).select_ca_atoms()
-        features = cdist(st_copy.coords, st_copy.coords).reshape(-1, 1)
+        chain_names = [chain.name for chain in st_copy.chains]
+        dists = cdist(st_copy.coords, st_copy.coords)
+        features = []
+        for i in st_copy.chain2ind[chain_names[0]]:
+            for j in st_copy.chain2ind[chain_names[1]]:
+                features.append(dists[i, j])
         return torch.tensor(features, dtype=torch.float)
 
     def _get_adjacency_info(self, st):
         st_copy = st.copy()
         st_copy.select_interface(self.cutoff).select_ca_atoms()
-        edges = [[i, j] for i in range(st_copy.coords.shape[0]) for j in range(st_copy.coords.shape[0])]
+        chain_names = [chain.name for chain in st_copy.chains]
+        edges = [[i, j] for i in st_copy.chain2ind[chain_names[0]] for j in st_copy.chain2ind[chain_names[1]]]
         return torch.tensor(edges, dtype=torch.long).t().contiguous()

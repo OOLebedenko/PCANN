@@ -34,6 +34,8 @@ class DimerStructure:
         self.st.setup_entities()
         self._copy = self.st
         self.pretrained_embeddings = None
+        self.ind2chain = {}
+        self.chain2ind = {}
 
     def iterate_over_atoms(self) -> Iterator[Tuple[gemmi.Model, gemmi.Chain, gemmi.Residue, gemmi.Atom]]:
         for model in self.st:
@@ -85,6 +87,8 @@ class DimerStructure:
         for model, chain, residue, atom in self.iterate_over_atoms():
             if not coords_chain.get(chain.name):
                 coords_chain[chain.name] = []
+            if not self.chain2ind.get(chain.name):
+                self.chain2ind[chain.name] = []
             coords_chain[chain.name].append(atom)
         assert len(coords_chain) == 2, f"{self.st.name} is not dimer"
 
@@ -96,8 +100,13 @@ class DimerStructure:
         monomer_1_ats_interface: typing.List[gemmi.Atom] = [monomer_1_ats[ind].serial for ind in dist.row]
         monomer_2_ats_interface: typing.List[gemmi.Atom] = [monomer_2_ats[ind].serial for ind in dist.col]
 
+        ind = 0
         for model, chain, residue, atom in self.iterate_over_atoms():
-            if (atom.serial in monomer_1_ats_interface) or (atom.serial in monomer_2_ats_interface):
+            if atom.serial in monomer_1_ats_interface or atom.serial in monomer_2_ats_interface:
+                if residue.flag != "i":
+                    self.ind2chain[ind] = chain.name
+                    self.chain2ind[chain.name].append(ind)
+                    ind += 1
                 residue.flag = "i"
 
         selection = gemmi.Selection('/1').set_residue_flags('i')
