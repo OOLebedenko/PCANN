@@ -113,9 +113,11 @@ class DimerStructure:
         self.st = selection.copy_structure_selection(self.st)
         return self
 
+    @property
     def residues(self) -> List[gemmi.Residue]:
         return [residue for _, _, residue in self.iterate_over_residues()]
 
+    @property
     def atoms(self):
         return [atom for _, _, _, atom in self.iterate_over_atoms()]
 
