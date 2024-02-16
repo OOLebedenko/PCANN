@@ -18,7 +18,7 @@ def convert_3to1(list_of_aa: Union[List, Tuple]):
     dict_3to1 = {
         "ALA": 'A', "ARG": 'R', "ASH": 'D', "ASN": 'N', "ASP": 'D',
         "CYM": 'C', "CYS": 'C', "CYX": 'C', "GLH": 'E', "GLN": 'Q',
-        "GLU": 'E', "GLY": 'G', "HID": 'H', "HIE": 'H', "HIP": 'H',
+        "GLU": 'E', "GLX": 'E', "GLY": 'G', "HID": 'H', "HIE": 'H', "HIP": 'H',
         "HIS": 'H', "HYP": 'O', "ILE": 'I', "LEU": 'L', "LYN": 'K',
         "LYS": 'K', "MET": 'M', "PHE": 'F', "PRO": 'P', "SER": 'S',
         "THR": 'T', "TRP": 'W', "TYR": 'Y', "VAL": 'V'
@@ -83,6 +83,11 @@ class DimerStructure:
 
     def copy(self) -> "DimerStructure":
         return copy(self)
+
+    def select(self, gemmi_selection) -> "DimerStructure":
+        selection = gemmi.Selection(gemmi_selection)
+        self.st = selection.copy_structure_selection(self.st)
+        return self
 
     def select_ca_atoms(self) -> "DimerStructure":
         self.st = gemmi.Selection('CA[C]').copy_structure_selection(self.st)
