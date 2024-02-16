@@ -26,6 +26,15 @@ def convert_3to1(list_of_aa: Union[List, Tuple]):
     return "".join([dict_3to1[aa] for aa in list_of_aa])
 
 
+def convert_1to3(list_of_aa: Union[List, Tuple]):
+    dict_1to3 = {'A': 'ALA', 'R': 'ARG', 'D': 'ASP', 'N': 'ASN', 'C': 'CYS',
+                 'E': 'GLU', 'Q': 'GLN', 'G': 'GLY', 'H': 'HIS', 'O': 'HYP',
+                 'I': 'ILE', 'L': 'LEU', 'K': 'LYS', 'M': 'MET', 'F': 'PHE',
+                 'P': 'PRO', 'S': 'SER', 'T': 'THR', 'W': 'TRP', 'Y': 'TYR', 'V': 'VAL'
+                 }
+    return "".join([dict_1to3[aa] for aa in list_of_aa])
+
+
 class DimerStructure:
 
     def __init__(self,
@@ -141,6 +150,19 @@ class DimerStructure:
             three_letter_seq = [residue.name for residue in chain if residue.name]
             sequences[chain.name] = convert_3to1(three_letter_seq)
         return sequences
+
+    def mutate_sequence(self, mutation):
+
+        mutated_chain_name = mutation[0]
+        ref = mutation.split(":")[-1][0]
+        pos = int(mutation.split(":")[-1][1:-1])
+        mut = mutation.split(":")[-1][-1]
+
+        for model, chain, residue in self.iterate_over_residues():
+            if chain.name == mutated_chain_name:
+                if residue.seqid.num == pos:
+                    assert residue.name == convert_1to3([ref])
+                    residue.name = convert_1to3([mut])
 
     @property
     def coords(self):
