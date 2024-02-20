@@ -96,7 +96,7 @@ class KdModel(BaseModel):
 
         self.convs.append(MetaLayer(
             EdgeConvLayer(node_feature_dim=node_feature_dim,
-                          edge_feature_dim_in=1,
+                          edge_feature_dim_in=edge_feature_dim,
                           edge_hidden_dim=edge_hidden_dim,
                           edge_feature_dim_out=edge_feature_dim,
                           residuals=self.residuals_edges),
@@ -132,7 +132,7 @@ class KdModel(BaseModel):
                 self.linear_layer_nodes.append(nn.Linear(node_embedding_dim, node_embedding_dim))
 
             if linear_layer_edges:
-                self.linear_layer_edges.append(nn.Linear(node_embedding_dim, node_embedding_dim))
+                self.linear_layer_edges.append(nn.Linear(edge_feature_dim, edge_feature_dim))
 
             if batchnorm:
                 self.batchnorms.append(BatchNorm(node_embedding_dim))
