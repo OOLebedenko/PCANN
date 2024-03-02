@@ -95,7 +95,10 @@ class Trainer:
                 self.save_checkpoint(epoch, save_best=best)
 
             if self.lr_scheduler is not None:
-                self.lr_scheduler.step()
+                if type(self.lr_scheduler).__name__ == 'ReduceLROnPlateau':
+                    self.lr_scheduler.step(result[self.mnt_metric])
+                else:
+                    self.lr_scheduler.step()
 
     @logged(logger=logger, message_after=log_train_epoch)
     def train_epoch(self, epoch):
