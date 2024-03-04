@@ -45,6 +45,7 @@ def log_valid_epoch(result, logger, *args, **kwargs):
 
 def log_train_epoch(result, logger, *args, **kwargs):
     log = {'epoch': args[-1]}
+    log.update({'lr': args[0].optimizer.param_groups[0]['lr']})
     log.update(result)
 
     for key, value in log.items():
