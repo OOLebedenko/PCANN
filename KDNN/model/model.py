@@ -96,7 +96,7 @@ class KdModel(BaseModel):
 
         self.convs.append(MetaLayer(
             EdgeConvLayer(node_feature_dim=node_feature_dim,
-                          edge_feature_dim_in=edge_feature_dim,
+                          edge_feature_dim_in=1,
                           edge_hidden_dim=edge_hidden_dim,
                           edge_feature_dim_out=edge_feature_dim,
                           residuals=self.residuals_edges),
