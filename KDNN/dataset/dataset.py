@@ -149,7 +149,8 @@ class KdDataset(Dataset):
         """
         st_copy = st.copy()
         embeddings = st_copy.pretrained_embedding(self.pretrained_model)
-        interface_rids = [residue.seqid.num - 1 for residue in st_copy.select_interface(self.cutoff).select_ca_atoms().residues()]
+        interface_rids = [residue.seqid.num - 1 for residue in
+                          st_copy.select_interface(self.cutoff).select_ca_atoms().residues]
         return torch.tensor(embeddings[interface_rids], dtype=torch.float)
 
     def _get_edge_features(self, st) -> torch.Tensor:
