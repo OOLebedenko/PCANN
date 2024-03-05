@@ -6,7 +6,8 @@
     "args": {
       "node_feature_dim": 1280,
       "node_embedding_dim": 16,
-      "edge_feature_dim": 1
+      "edge_feature_dim": 8,
+      "edge_hidden_dim": 8
     }
   },
   "pretrained_model": {
