@@ -49,7 +49,7 @@ def run_testing(run_setup: SetupRun,
     model.eval()
     test_metrics = MetricTracker('loss', 'output', *[m.__name__ for m in metrics], writer=vizualizer_setup)
 
-    message = ["number", "predicted", "target", "loss"]
+    message = ["number", "pdb_id", "predicted", "target", "loss"]
     for met in metrics:
         message.append(met.__name__)
 
@@ -66,7 +66,7 @@ def run_testing(run_setup: SetupRun,
             test_metrics.update('loss', loss.item())
             test_metrics.update('output', output)
 
-            message = [batch_idx + 1, output.item(), target.item(), loss.item()]
+            message = [batch_idx + 1, data.label[0], output.item(), target.item(), loss.item()]
 
             for met in metrics:
                 test_metrics.update(met.__name__, met(output, target))
