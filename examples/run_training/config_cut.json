@@ -1,0 +1,95 @@
+{
+  "outdir": "interface_cutoff_5.0/esm2_t33_650M_UR50D/example_run",
+  "device": "cpu",
+  "arch": {
+    "type": "KdModel",
+    "args": {
+      "node_feature_dim": 1280,
+      "node_embedding_dim": 16,
+      "edge_feature_dim": 1
+    }
+  },
+  "pretrained_model": {
+    "type": "EsmPretrainedModel",
+    "args": {
+      "path_to_esm_dir": "{ENTER_YOUR_PATH}/esm",
+      "name": "esm2_t33_650M_UR50D"
+    }
+  },
+  "dataset_train": {
+    "type": "KdDatasetCut",
+    "args": {
+      "root": "../create_graph_dataset/",
+      "path_to_pdb_dir": "pdb",
+      "path_to_target_csv": "log_kd_train.csv",
+      "pdb_fname_format": "{}.pdb1",
+      "interactions_cutoff": 15.0
+    }
+  },
+  "dataset_valid": {
+    "type": "KdDatasetCut",
+    "args": {
+      "root": "../create_graph_dataset/",
+      "path_to_pdb_dir": "pdb",
+      "path_to_target_csv": "log_kd_valid.csv",
+      "pdb_fname_format": "{}.pdb1",
+      "interactions_cutoff": 15.0
+    }
+  },
+  "dataset_test": {
+    "type": "KdDatasetCut",
+    "args": {
+      "root": "../create_graph_dataset/",
+      "path_to_pdb_dir": "pdb",
+      "path_to_target_csv": "log_kd_test.csv",
+      "pdb_fname_format": "{}.pdb1",
+      "interactions_cutoff": 15.0
+    }
+  },
+  "dataset": {},
+  "dataset_transforms": {},
+  "dataloader": {
+    "type": "set_dataloaders",
+    "args": {
+      "batch_size": 1,
+      "shuffle": true,
+      "validation_split": 0.2,
+      "num_workers": 2
+    }
+  },
+  "optimizer": {
+    "type": "Adam",
+    "args": {
+      "lr": 0.001,
+      "weight_decay": 0,
+      "amsgrad": true
+    }
+  },
+  "loss": {
+    "type": "mse_loss",
+    "args": {}
+  },
+  "metrics": {
+    "metric_1": {
+      "type": "mean_squared_relative_mse",
+      "args": {}
+    }
+  },
+  "lr_scheduler": {
+    "type": "StepLR",
+    "args": {
+      "step_size": 1000000,
+      "gamma": 0.1
+    }
+  },
+  "trainer": {
+    "type": "Trainer",
+    "args": {
+      "epochs": 1,
+      "checkpoint_freq": 1,
+      "monitor": "min val_loss",
+      "early_stop": 10,
+      "tensorboard": true
+    }
+  }
+}

@@ -159,3 +159,52 @@ class KdDataset(Dataset):
         st_copy.select_interface(self.cutoff).select_ca_atoms()
         edges = [[i, j] for i in range(st_copy.coords.shape[0]) for j in range(st_copy.coords.shape[0])]
         return torch.tensor(edges, dtype=torch.long).t().contiguous()
+
+
+class KdDatasetCut(KdDataset):
+    def __init__(self,
+                 path_to_pdb_dir: AnyPath,
+                 path_to_target_csv: AnyPath,
+                 pretrained_model: PretrainedModel,
+                 pdb_fname_format="{}.pdb1.gz",
+                 root: AnyPath = ".",
+                 interface_cutoff: float = 5.0,
+                 n_process: int = 1,
+                 transform: Optional[Callable] = None,
+                 pre_transform: Optional[Callable] = None,
+                 pre_filter: Optional[Callable] = None,
+                 interactions_cutoff: float = 15.0
+                 ):
+        """
+        :param root: where dataset should be stored. This folder is split into
+                     raw_dir (original datset) and processed_dir (processed data (graph))
+        :param transform:
+        :param pre_transform:
+        :param pre_filter:
+        :param raw_dirname: override the 'raw' name in base class
+                            self.raw_dir = os.path.join(self.root, 'raw')
+        :param processed_dirname: override the 'processed' name in base class
+                                  self.processed_dir = os.path.join(self.root, 'processed')
+        """
+        self.interactions_cutoff = interactions_cutoff
+        super().__init__(path_to_pdb_dir,
+                         path_to_target_csv,
+                         pretrained_model,
+                         pdb_fname_format,
+                         root,
+                         interface_cutoff,
+                         n_process,
+                         transform,
+                         pre_transform,
+                         pre_filter
+                         )
+
+    def get(self, idx) -> Tuple[torch.Tensor, torch.Tensor]:
+        r"""Gets the data object at index :obj:`idx`."""
+        data, target = super().get(idx)
+
+        indices = torch.nonzero(data.edge_attr < self.interactions_cutoff)
+        data.edge_attr = data.edge_attr[indices[:, 0]]
+        data.edge_index = data.edge_index[:, indices[:, 0]]
+
+        return data, target
