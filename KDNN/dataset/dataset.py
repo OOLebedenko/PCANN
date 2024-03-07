@@ -201,16 +201,10 @@ class KdDatasetCut(KdDataset):
 
     def get(self, idx) -> Tuple[torch.Tensor, torch.Tensor]:
         r"""Gets the data object at index :obj:`idx`."""
-        molfile_pt = self.processed_paths[idx]
-
-        target = self.df_kd["target"][self.df_kd["pdb_id"] == os.path.basename(molfile_pt).split(".pt")[0]].values
-        target = torch.from_numpy(target).float()
-        data = torch.load(os.path.join(molfile_pt))
+        data, target = super().get(idx)
 
         indices = torch.nonzero(data.edge_attr < self.interactions_cutoff)
         data.edge_attr = data.edge_attr[indices[:, 0]]
         data.edge_index = data.edge_index[:, indices[:, 0]]
-
-        data.label = os.path.basename(molfile_pt).split(".")[0]
 
         return data, target
