@@ -18,12 +18,21 @@ def convert_3to1(list_of_aa: Union[List, Tuple]):
     dict_3to1 = {
         "ALA": 'A', "ARG": 'R', "ASH": 'D', "ASN": 'N', "ASP": 'D',
         "CYM": 'C', "CYS": 'C', "CYX": 'C', "GLH": 'E', "GLN": 'Q',
-        "GLU": 'E', "GLY": 'G', "HID": 'H', "HIE": 'H', "HIP": 'H',
+        "GLU": 'E', "GLX": 'E', "GLY": 'G', "HID": 'H', "HIE": 'H', "HIP": 'H',
         "HIS": 'H', "HYP": 'O', "ILE": 'I', "LEU": 'L', "LYN": 'K',
         "LYS": 'K', "MET": 'M', "PHE": 'F', "PRO": 'P', "SER": 'S',
         "THR": 'T', "TRP": 'W', "TYR": 'Y', "VAL": 'V'
     }
     return "".join([dict_3to1[aa] for aa in list_of_aa])
+
+
+def convert_1to3(list_of_aa: Union[List, Tuple]):
+    dict_1to3 = {'A': 'ALA', 'R': 'ARG', 'D': 'ASP', 'N': 'ASN', 'C': 'CYS',
+                 'E': 'GLU', 'Q': 'GLN', 'G': 'GLY', 'H': 'HIS', 'O': 'HYP',
+                 'I': 'ILE', 'L': 'LEU', 'K': 'LYS', 'M': 'MET', 'F': 'PHE',
+                 'P': 'PRO', 'S': 'SER', 'T': 'THR', 'W': 'TRP', 'Y': 'TYR', 'V': 'VAL'
+                 }
+    return "".join([dict_1to3[aa] for aa in list_of_aa])
 
 
 class DimerStructure:
@@ -75,6 +84,11 @@ class DimerStructure:
     def copy(self) -> "DimerStructure":
         return copy(self)
 
+    def select(self, gemmi_selection) -> "DimerStructure":
+        selection = gemmi.Selection(gemmi_selection)
+        self.st = selection.copy_structure_selection(self.st)
+        return self
+
     def select_ca_atoms(self) -> "DimerStructure":
         self.st = gemmi.Selection('CA[C]').copy_structure_selection(self.st)
         return self
@@ -104,9 +118,11 @@ class DimerStructure:
         self.st = selection.copy_structure_selection(self.st)
         return self
 
+    @property
     def residues(self) -> List[gemmi.Residue]:
         return [residue for _, _, residue in self.iterate_over_residues()]
 
+    @property
     def atoms(self):
         return [atom for _, _, _, atom in self.iterate_over_atoms()]
 
@@ -141,6 +157,19 @@ class DimerStructure:
             three_letter_seq = [residue.name for residue in chain if residue.name]
             sequences[chain.name] = convert_3to1(three_letter_seq)
         return sequences
+
+    def mutate_sequence(self, mutation):
+
+        mutated_chain_name = mutation[0]
+        ref = mutation.split(":")[-1][0]
+        pos = int(mutation.split(":")[-1][1:-1])
+        mut = mutation.split(":")[-1][-1]
+
+        for model, chain, residue in self.iterate_over_residues():
+            if chain.name == mutated_chain_name:
+                if residue.seqid.num == pos:
+                    assert residue.name == convert_1to3([ref])
+                    residue.name = convert_1to3([mut])
 
     @property
     def coords(self):

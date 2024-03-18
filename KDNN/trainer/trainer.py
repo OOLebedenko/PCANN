@@ -141,11 +141,11 @@ class Trainer:
 
         self.writer.set_step((epoch - 1) * len(self.data_loader) + batch_idx)
 
-        self.train_metrics.update('loss', loss.item())
+        loss_val = loss.detach()
+        self.train_metrics.update('loss', loss_val)
         for met in self.metric_ftns:
-            self.train_metrics.update(met.__name__, met(output, target))
-
-        return loss
+            self.train_metrics.update(met.__name__, met(output.detach(), target.detach()))
+        return loss_val
 
     def valid_batch(self, epoch, batch_idx, data, target):
         data, target = data.to(self.device), target.to(self.device)
@@ -154,9 +154,9 @@ class Trainer:
         loss = self.criterion(output, target)
 
         self.writer.set_step((epoch - 1) * len(self.valid_data_loader) + batch_idx, 'valid')
-        self.valid_metrics.update('loss', loss.item())
+        self.valid_metrics.update('loss', loss.detach())
         for met in self.metric_ftns:
-            self.valid_metrics.update(met.__name__, met(output, target))
+            self.valid_metrics.update(met.__name__, met(output.detach(), target.detach()))
         return self.valid_metrics
 
     def save_checkpoint(self, epoch, save_best=False):
