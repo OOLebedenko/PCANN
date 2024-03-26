@@ -110,8 +110,8 @@ class Trainer:
         """
         self.model.train()
         self.train_metrics.reset()
-        for batch_idx, (data, target) in enumerate(self.data_loader):
-            self.train_batch(epoch, batch_idx, data, target)
+        for batch_idx, data in enumerate(self.data_loader):
+            self.train_batch(epoch, batch_idx, data, data.target)
 
         return self.train_metrics.result()
 
@@ -125,8 +125,8 @@ class Trainer:
         self.model.eval()
         self.valid_metrics.reset()
         with torch.no_grad():
-            for batch_idx, (data, target) in enumerate(self.valid_data_loader):
-                self.valid_batch(epoch, batch_idx, data, target)
+            for batch_idx, data in enumerate(self.valid_data_loader):
+                self.valid_batch(epoch, batch_idx, data, data.target)
         return self.valid_metrics.result()
 
     @logged(logger=logger, message_after=log_train_batch)

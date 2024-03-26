@@ -56,9 +56,9 @@ def run_testing(run_setup: SetupRun,
     logger.info(" - ".join(message))
 
     with torch.no_grad():
-        for batch_idx, (data, target) in enumerate(tqdm(test_loader)):
+        for batch_idx, data in enumerate(tqdm(test_loader)):
 
-            data, target = data.to(device), target.to(device)
+            data, target = data.to(device), data.target.to(device)
             output = model(data)
             loss = criterion(output, target)
 

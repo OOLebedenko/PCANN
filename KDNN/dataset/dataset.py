@@ -137,7 +137,8 @@ class KdDataset(Dataset):
         target = torch.from_numpy(target).float()
         data = torch.load(os.path.join(molfile_pt))
         data.label = os.path.basename(molfile_pt).split(".")[0]
-        return data, target
+        data.target = target.view(-1, 1)
+        return data
 
     def len(self) -> int:
         return len(self.processed_paths)
