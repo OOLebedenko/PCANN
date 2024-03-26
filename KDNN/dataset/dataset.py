@@ -138,6 +138,10 @@ class KdDataset(Dataset):
         data = torch.load(os.path.join(molfile_pt))
         data.label = os.path.basename(molfile_pt).split(".")[0]
         data.target = target.view(-1, 1)
+
+        st = DimerStructure(self.raw_paths[idx])
+        st.clean().select_interface(self.cutoff).select_ca_atoms()
+        data.chain_break_point = len(st.chains[0])
         return data
 
     def len(self) -> int:
