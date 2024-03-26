@@ -193,15 +193,14 @@ class DimerStructure:
 
 class PretrainedModel:
     def __init__(self,
-                 path_to_esm_dir: AnyPath,
+                 path_to_model_dir: AnyPath,
                  name: str,
                  use_gpu: bool = False):
-        self.path_to_esm_dir = path_to_esm_dir
+        self.path_to_model_dir = path_to_model_dir
         self.name = name
         self.use_gpu = use_gpu
 
-    def _build_command_template(self,
-                                path_to_esm_dir: AnyPath) -> str:
+    def _build_command_template(self) -> str:
         raise NotImplementedError
 
     def predict(self,
@@ -214,7 +213,7 @@ class PretrainedModel:
                     tmp_fasta_file.write("\n")
                     tmp_fasta_file.write(sequence)
                     tmp_fasta_file.write("\n")
-            command_template = self._build_command_template(self.path_to_esm_dir)
+            command_template = self._build_command_template()
             subprocess.call(command_template.format(fasta_file=os.path.join(tmp_dir, 'tmp.fasta'),
                                                     outdir=tmp_dir).split())
             for chain_name in st.sequence_by_chains.keys():
@@ -225,13 +224,18 @@ class PretrainedModel:
 
 class EsmPretrainedModel(PretrainedModel):
 
-    def _build_command_template(self,
-                                path_to_esm_dir: AnyPath) -> str:
+    def __init__(self,
+                 path_to_model_dir: AnyPath,
+                 name: str,
+                 use_gpu: bool = False):
+        super(EsmPretrainedModel, self).__init__(path_to_model_dir, name, use_gpu)
+
+    def _build_command_template(self) -> str:
         if self.use_gpu:
             device_flag = ""
         else:
             device_flag = "--nogpu"
-        os.putenv("PYTHONPATH", os.pathsep.join([os.getenv("PYTHONPATH", ""), path_to_esm_dir]))
-        command_template = f"python3 {os.path.join(path_to_esm_dir, 'scripts', 'extract.py')} " \
+        os.putenv("PYTHONPATH", os.pathsep.join([os.getenv("PYTHONPATH", ""), self.path_to_model_dir]))
+        command_template = f"python3 {os.path.join(self.path_to_model_dir, 'scripts', 'extract.py')} " \
                            f"{self.name} {{fasta_file}} {{outdir}} --include per_tok {device_flag}"
         return command_template

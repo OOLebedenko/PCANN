@@ -12,7 +12,7 @@
   "pretrained_model": {
     "type": "EsmPretrainedModel",
     "args": {
-      "path_to_esm_dir": "{ENTER_YOUR_PATH}/esm",
+      "path_to_model_dir": "{ENTER_YOUR_PATH}/esm",
       "name": "esm2_t33_650M_UR50D"
     }
   },
