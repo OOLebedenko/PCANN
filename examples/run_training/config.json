@@ -43,7 +43,16 @@
       "pdb_fname_format": "{}.pdb1"
     }
   },
-  "dataset_transforms": {},
+  "dataset_transforms": {
+    "transform_1": {
+      "type": "InteractionGraph",
+      "args": {}
+    },
+    "transform_2": {
+      "type": "NormalizeNodeFeatures",
+      "args": {}
+    }
+  },
   "dataloader": {
     "type": "set_dataloaders",
     "args": {

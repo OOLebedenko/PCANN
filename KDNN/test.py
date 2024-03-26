@@ -3,8 +3,10 @@ import os
 
 import torch
 import torch.nn.functional as F
+import torch_geometric.transforms as T
 
 import KDNN.dataset as module_dataset
+import KDNN.dataset.transform as module_transform
 import KDNN.utils.metric as module_metric
 import KDNN.model.model as module_arch
 
@@ -27,9 +29,14 @@ def run_testing(run_setup: SetupRun,
 
     # setup dataset
     pretrained_model = run_setup.init_obj("pretrained_model", module_dataset)
+
+    dataset_transforms = T.Compose([run_setup.init_obj(transform, module_transform)
+                                        for transform in run_setup['dataset_transforms']])
     dataset = run_setup.init_obj(name=f'dataset_{dataset_type}',
                                  module=module_dataset,
-                                 pretrained_model=pretrained_model)
+                                 pretrained_model=pretrained_model,
+                                 transform=dataset_transforms
+                                )
     # setup data_loader instances
     test_loader = DataLoader(dataset=dataset, batch_size=1)
 
