@@ -121,34 +121,17 @@ def setup_data_samplers(dataset_size, validation_split, shuffle, random_seed):
 
 
 def setup_data_loaders(
-        dataset: Dataset,
-        batch_size: int,
-        shuffle: bool,
-        validation_split: float,
-        num_workers: int,
-        random_seed: int = 0):
-    init_kwargs = {
-        'batch_size': batch_size,
-        'num_workers': num_workers
-    }
-    train_sampler, validation_sampler = setup_data_samplers(len(dataset), validation_split, shuffle, random_seed)
-    train_loader = DataLoader(dataset=dataset, sampler=train_sampler, **init_kwargs)
-    validation_loader = DataLoader(dataset=dataset, sampler=validation_sampler, **init_kwargs)
-
-    return train_loader, validation_loader
-
-
-def setup_split_data_loaders(
         dataset_train: Dataset,
         dataset_valid: Dataset,
-        batch_size: int,
-        shuffle: bool,
-        num_workers: int,
+        batch_size: int = 1,
+        shuffle: bool = False,
+        num_workers: int = 1,
         **kwargs):
     init_kwargs = {
         'batch_size': batch_size,
         'num_workers': num_workers
     }
+    init_kwargs.update(kwargs)
 
     if shuffle:
         dataset_train.shuffle()

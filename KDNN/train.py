@@ -8,7 +8,7 @@ import KDNN.dataset as module_dataset
 import KDNN.model.model as module_arch
 import KDNN.utils.metric as module_metric
 
-from KDNN.utils.setup import setup_data_loaders, setup_split_data_loaders
+from KDNN.utils.setup import setup_data_loaders
 from KDNN.utils.setup import SetupRun
 from KDNN.utils.logging import SetupLogger
 from KDNN.utils.util import read_json
@@ -24,34 +24,24 @@ def run_training(run_setup: SetupRun,
     logger = logger_setup.get_logger("train")
 
     # setup dataset
-    assert bool(run_setup["dataset_train"] and run_setup["dataset_valid"] and run_setup["dataset"]) != 1, \
-        "Please, specify 1) dataset in config with validation_split parameter or \n 2) dataset_train and dataset_valid"
+    pretrained_model = run_setup.init_obj("pretrained_model", module_dataset)
 
-    if run_setup["dataset_train"] and run_setup["dataset_valid"]:
-        pretrained_model = run_setup.init_obj("pretrained_model", module_dataset)
+    dataset_train = run_setup.init_obj(name='dataset_train',
+                                       module=module_dataset,
+                                       pretrained_model=pretrained_model,
+                                       )
 
-        dataset_train = run_setup.init_obj(name='dataset_train',
-                                           module=module_dataset,
-                                           pretrained_model=pretrained_model)
+    dataset_valid = run_setup.init_obj(name='dataset_valid',
+                                       module=module_dataset,
+                                       pretrained_model=pretrained_model,
+                                       )
+    logger.info(dataset_train)
+    logger.info(dataset_valid)
 
-        dataset_valid = run_setup.init_obj('dataset_valid',
-                                           module_dataset,
-                                           pretrained_model=pretrained_model
-                                           )
-        logger.info(dataset_train)
-        logger.info(dataset_valid)
-
-        # setup data_loader instances
-        data_loader, valid_data_loader = setup_split_data_loaders(dataset_train=dataset_train,
-                                                                  dataset_valid=dataset_valid,
-                                                                  **run_setup["dataloader"]["args"])
-
-    elif run_setup["dataset"]:
-        dataset = run_setup.init_obj('dataset', module_dataset)
-        logger.info(dataset)
-
-        # setup data_loader instances
-        data_loader, valid_data_loader = setup_data_loaders(dataset=dataset, **run_setup["dataloader"]["args"])
+    # setup data_loader instances
+    data_loader, valid_data_loader = setup_data_loaders(dataset_train=dataset_train,
+                                                        dataset_valid=dataset_valid,
+                                                        **run_setup["dataloader"]["args"])
 
     # setup model architecture, then print to console
     model = run_setup.init_obj('arch', module_arch)
