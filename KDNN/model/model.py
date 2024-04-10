@@ -69,7 +69,7 @@ class EdgeConvLayerWithoutEdge(nn.Module):
             nn.Linear(edge_hidden_dim, edge_feature_dim_out),
         )
 
-    def forward(self, src, dest, u=None, batch=None):
+    def forward(self, src, dest, edge_attr, u=None, batch=None):
         out = torch.cat([src, dest], 1)
         out = self.edge_mlp(out)
         return out
@@ -509,7 +509,7 @@ class KdModel_DifferentSizeEdgeConv(BaseModel):
         for _ in range(self.num_layers - 1):
 
             meta = MetaLayer(
-                EdgeConvLayer(node_feature_dim=node_feature_dim,
+                EdgeConvLayer(node_feature_dim=node_embedding_dim,
                               edge_feature_dim_in=edge_feature_dim,
                               edge_hidden_dim=edge_hidden_dim,
                               edge_feature_dim_out=edge_feature_dim),
@@ -563,7 +563,6 @@ class KdModel_MLPIn(BaseModel):
     def __init__(self,
                  node_feature_dim: Union[int, Tuple[int, int]],
                  node_embedding_dim: int,
-                 edge_feature_dim: int,
                  num_layers: int = 4,
                  linear_layer_nodes: bool = False,
                  linear_layer_edges: bool = False,
@@ -616,7 +615,7 @@ class KdModel_MLPIn(BaseModel):
                                   Linear(node_embedding_dim, node_embedding_dim // 2), ReLU(),
                                   Linear(node_embedding_dim // 2, 1))
 
-        self.mlp_in = Sequential(Linear(1, node_embedding_dim// 2 // 2), ReLU(),
+        self.mlp_edge_in = Sequential(Linear(1, node_embedding_dim// 2 // 2), ReLU(),
                                  Linear(node_embedding_dim// 2 // 2, node_embedding_dim // 2), ReLU(),
                                  Linear(node_embedding_dim // 2, node_embedding_dim))
 
@@ -625,7 +624,7 @@ class KdModel_MLPIn(BaseModel):
         x, edge_index, edge_attr, batch = data.x, data.edge_index, data.edge_attr, data.batch
         layers = zip(self.convs, self.batchnorms) if self.batchnorms else self.convs
 
-        edge_attr = self.mlp_in(edge_attr)
+        edge_attr = self.mlp_edge_in(edge_attr)
 
         for i, layer in enumerate(layers):
             if self.batchnorms:
@@ -647,7 +646,7 @@ class KdModel_MLPIn(BaseModel):
             x = h
 
         x = global_mean_pool(x, batch)
-        return self.mlp(x)
+        return self.mlp_out(x)
 
 class KdModel_DifferentSizeEdgeConvFromEdges(BaseModel):
     def __init__(self,
@@ -730,7 +729,6 @@ class KdModel_DifferentSizeEdgeConvFromEdges(BaseModel):
                     edge_attr = F.relu(self.linear_layer_edges[i](edge_attr))
 
             x = h
-
 
         batch_edge = batch[edge_index[0]]
 
