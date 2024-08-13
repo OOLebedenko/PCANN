@@ -165,7 +165,7 @@ class DimerStructure:
         return self.st.write_pdb(str(path), gemmi.PdbWriteOptions(minimal=True, numbered_ter=False))
 
     @property
-    def sequence_by_chains(self):
+    def model_sequence_by_chains(self):
         sequences = {}
         for chain in self.st[0]:
             three_letter_seq = [residue.name for residue in chain if residue.name]
@@ -248,16 +248,20 @@ class PretrainedModel:
     def _build_command_template(self) -> str:
         raise NotImplementedError
 
+    def load_data(self,
+                  path_to_directory,
+                  path_to_file):
+        raise NotImplementedError
+
     def predict(self,
-                st: "DimerStructure") -> Dict[str, np.array]:
-        embeddings = {}
+                sequence: "str"):
         with tempfile.TemporaryDirectory() as tmp_dir:
             with open(os.path.join(tmp_dir, 'tmp.fasta'), "w") as tmp_fasta_file:
-                for chain_name, sequence in st.sequence_by_chains.items():
-                    tmp_fasta_file.write(f">{chain_name}")
-                    tmp_fasta_file.write("\n")
-                    tmp_fasta_file.write(sequence)
-                    tmp_fasta_file.write("\n")
+                tmp_fasta_file.write(f">tmp")
+                tmp_fasta_file.write("\n")
+                tmp_fasta_file.write(sequence)
+                tmp_fasta_file.write("\n")
+
             command_template = self._build_command_template()
             subprocess.call(command_template.format(fasta_file=os.path.join(tmp_dir, 'tmp.fasta'),
                                                     outdir=tmp_dir).split())
@@ -282,3 +286,9 @@ class EsmPretrainedModel(PretrainedModel):
         command_template = f"python3 {os.path.join(self.path_to_model_dir, 'scripts', 'extract.py')} " \
                            f"{self.name} {{fasta_file}} {{outdir}} --include per_tok {device_flag}"
         return command_template
+
+    def load_data(self,
+                  path_to_directory,
+                  path_to_file
+                  ):
+        return next(iter(torch.load(os.path.join(path_to_directory, path_to_file))["representations"].values())).numpy()
