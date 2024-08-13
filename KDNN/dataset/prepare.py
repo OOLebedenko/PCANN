@@ -151,12 +151,15 @@ class DimerStructure:
         pretrained_embeddings = []
         indexes_by_chains = self._get_model_idx_in_fasta()
         for chain in self.chains:
-            if self.pretrained_embeddings is None:
-                self.pretrained_embeddings = _embeddings[chain.name]
-            else:
-                self.pretrained_embeddings = np.concatenate([self.pretrained_embeddings, _embeddings[chain.name]],
-                                                            axis=0)
-        return self.pretrained_embeddings
+            sequence = self.full_sequence_by_chains[chain.name]
+            indexes = indexes_by_chains[chain.name]
+            if clip_terminal_tags:
+                start, end = indexes[0] - 1, indexes[-1]
+                sequence = sequence[start:end]
+                indexes -= indexes[0]
+            chain_embeddings = pretrained_model.predict(sequence)[indexes]
+            pretrained_embeddings.append(chain_embeddings)
+        return np.concatenate(pretrained_embeddings)
 
     def write_pdb(self, path: AnyPath):
         return self.st.write_pdb(str(path), gemmi.PdbWriteOptions(minimal=True, numbered_ter=False))
