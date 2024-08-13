@@ -8,7 +8,7 @@ import numpy as np
 import torch
 
 from copy import copy
-from typing import Iterator, List, Tuple, Union, Dict
+from typing import Iterator, List, Tuple, Union
 from scipy.spatial import cKDTree
 
 AnyPath = Union[str, bytes, os.PathLike]
@@ -42,7 +42,6 @@ class DimerStructure:
         self.st = gemmi.read_pdb(pdb_file, split_chain_on_ter=True)
         self.st.setup_entities()
         self._copy = self.st
-        self.pretrained_embeddings = None
 
     def iterate_over_atoms(self) -> Iterator[Tuple[gemmi.Model, gemmi.Chain, gemmi.Residue, gemmi.Atom]]:
         for model in self.st:
@@ -64,6 +63,16 @@ class DimerStructure:
         selection = gemmi.Selection('/1').set_residue_flags('A')
         selection.remove_not_selected(self.st)
         return self
+
+    def check_gaps(self):
+        residue_ids = [residue.seqid.num
+                       for chain in self.st[0]
+                       for residue in chain
+                       ]
+
+        residue_ids = np.array(residue_ids)
+        gaps = residue_ids[1:] - residue_ids[:-1] - 1
+        return sum(gaps) > 0
 
     def remove_unk_residues(self) -> "DimerStructure":
         for _, _, residue in self.iterate_over_residues():
@@ -136,27 +145,63 @@ class DimerStructure:
         return self
 
     def pretrained_embedding(self,
-                             pretrained_model: "PretrainedModel"
+                             pretrained_model: "PretrainedModel",
+                             clip_terminal_tags=True
                              ):
-        _embeddings = pretrained_model.predict(self)
+        pretrained_embeddings = []
+        indexes_by_chains = self._get_model_idx_in_fasta()
         for chain in self.chains:
-            if self.pretrained_embeddings is None:
-                self.pretrained_embeddings = _embeddings[chain.name]
-            else:
-                self.pretrained_embeddings = np.concatenate([self.pretrained_embeddings, _embeddings[chain.name]],
-                                                            axis=0)
-        return self.pretrained_embeddings
+            sequence = self.full_sequence_by_chains[chain.name]
+            indexes = indexes_by_chains[chain.name]
+            if clip_terminal_tags:
+                start, end = indexes[0] - 1, indexes[-1]
+                sequence = sequence[start:end]
+                indexes -= indexes[0]
+            chain_embeddings = pretrained_model.predict(sequence)[indexes]
+            pretrained_embeddings.append(chain_embeddings)
+        return np.concatenate(pretrained_embeddings)
 
     def write_pdb(self, path: AnyPath):
         return self.st.write_pdb(str(path), gemmi.PdbWriteOptions(minimal=True, numbered_ter=False))
 
     @property
-    def sequence_by_chains(self):
+    def model_sequence_by_chains(self):
         sequences = {}
         for chain in self.st[0]:
             three_letter_seq = [residue.name for residue in chain if residue.name]
             sequences[chain.name] = convert_3to1(three_letter_seq)
         return sequences
+
+    @property
+    def full_sequence_by_chains(self):
+        sequences = {}
+        entites_dict = {entity.name: entity.full_sequence for entity in self.st.entities
+                        if entity.polymer_type.name == "PeptideL"}
+        for chain in self.chains:
+            chain_sequence = gemmi.one_letter_code(entites_dict[chain.name])
+            sequences[chain.name] = chain_sequence
+        return sequences
+
+    def _get_model_idx_in_fasta(self):
+        indexes_by_chains = {}
+        for chain in self.chains:
+            result = self._align_model_to_full_sequence()[chain.name]
+            seq_with_gaps = result.add_gaps(self.model_sequence_by_chains[chain.name], 2)
+            indexes = np.array([ind for ind, resname in enumerate(seq_with_gaps, 1)
+                                if resname != "-"])
+            indexes_by_chains[chain.name] = indexes
+        return indexes_by_chains
+
+    def _align_model_to_full_sequence(self):
+        alignment = {}
+
+        for entity in self.st.entities:
+            if entity.polymer_type.name == "PeptideL":
+                alignment[entity.name] = gemmi.align_sequence_to_polymer(entity.full_sequence,
+                                                                         self.st[0][entity.name].get_polymer(),
+                                                                         gemmi.PolymerType.PeptideL,
+                                                                         gemmi.AlignmentScoring())
+        return alignment
 
     def mutate_sequence(self, mutation):
 
@@ -203,22 +248,24 @@ class PretrainedModel:
     def _build_command_template(self) -> str:
         raise NotImplementedError
 
+    def load_data(self,
+                  path_to_directory,
+                  path_to_file):
+        raise NotImplementedError
+
     def predict(self,
-                st: "DimerStructure") -> Dict[str, np.array]:
-        embeddings = {}
+                sequence: "str"):
         with tempfile.TemporaryDirectory() as tmp_dir:
             with open(os.path.join(tmp_dir, 'tmp.fasta'), "w") as tmp_fasta_file:
-                for chain_name, sequence in st.sequence_by_chains.items():
-                    tmp_fasta_file.write(f">{chain_name}")
-                    tmp_fasta_file.write("\n")
-                    tmp_fasta_file.write(sequence)
-                    tmp_fasta_file.write("\n")
+                tmp_fasta_file.write(f">tmp")
+                tmp_fasta_file.write("\n")
+                tmp_fasta_file.write(sequence)
+                tmp_fasta_file.write("\n")
+
             command_template = self._build_command_template()
             subprocess.call(command_template.format(fasta_file=os.path.join(tmp_dir, 'tmp.fasta'),
                                                     outdir=tmp_dir).split())
-            for chain_name in st.sequence_by_chains.keys():
-                embeddings[chain_name] = next(
-                    iter(torch.load(os.path.join(tmp_dir, f"{chain_name}.pt"))["representations"].values())).numpy()
+            embeddings = self.load_data(tmp_dir, "tmp.pt")
         return embeddings
 
 
@@ -239,3 +286,9 @@ class EsmPretrainedModel(PretrainedModel):
         command_template = f"python3 {os.path.join(self.path_to_model_dir, 'scripts', 'extract.py')} " \
                            f"{self.name} {{fasta_file}} {{outdir}} --include per_tok {device_flag}"
         return command_template
+
+    def load_data(self,
+                  path_to_directory,
+                  path_to_file
+                  ):
+        return next(iter(torch.load(os.path.join(path_to_directory, path_to_file))["representations"].values())).numpy()
