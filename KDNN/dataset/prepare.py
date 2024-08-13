@@ -8,7 +8,7 @@ import numpy as np
 import torch
 
 from copy import copy
-from typing import Iterator, List, Tuple, Union, Dict
+from typing import Iterator, List, Tuple, Union
 from scipy.spatial import cKDTree
 
 AnyPath = Union[str, bytes, os.PathLike]
@@ -64,6 +64,16 @@ class DimerStructure:
         selection = gemmi.Selection('/1').set_residue_flags('A')
         selection.remove_not_selected(self.st)
         return self
+
+    def check_gaps(self):
+        residue_ids = [residue.seqid.num
+                       for chain in self.st[0]
+                       for residue in chain
+                       ]
+
+        residue_ids = np.array(residue_ids)
+        gaps = residue_ids[1:] - residue_ids[:-1] - 1
+        return sum(gaps) > 0
 
     def remove_unk_residues(self) -> "DimerStructure":
         for _, _, residue in self.iterate_over_residues():
@@ -158,6 +168,37 @@ class DimerStructure:
             sequences[chain.name] = convert_3to1(three_letter_seq)
         return sequences
 
+    @property
+    def full_sequence_by_chains(self):
+        sequences = {}
+        entites_dict = {entity.name: entity.full_sequence for entity in self.st.entities
+                        if entity.polymer_type.name == "PeptideL"}
+        for chain in self.chains:
+            chain_sequence = gemmi.one_letter_code(entites_dict[chain.name])
+            sequences[chain.name] = chain_sequence
+        return sequences
+
+    def _get_model_idx_in_fasta(self):
+        indexes_by_chains = {}
+        for chain in self.chains:
+            result = self._align_model_to_full_sequence()[chain.name]
+            seq_with_gaps = result.add_gaps(self.model_sequence_by_chains[chain.name], 2)
+            indexes = np.array([ind for ind, resname in enumerate(seq_with_gaps, 1)
+                                if resname != "-"])
+            indexes_by_chains[chain.name] = indexes
+        return indexes_by_chains
+
+    def _align_model_to_full_sequence(self):
+        alignment = {}
+
+        for entity in self.st.entities:
+            if entity.polymer_type.name == "PeptideL":
+                alignment[entity.name] = gemmi.align_sequence_to_polymer(entity.full_sequence,
+                                                                         self.st[0][entity.name].get_polymer(),
+                                                                         gemmi.PolymerType.PeptideL,
+                                                                         gemmi.AlignmentScoring())
+        return alignment
+
     def mutate_sequence(self, mutation):
 
         mutated_chain_name = mutation[0]
@@ -216,9 +257,7 @@ class PretrainedModel:
             command_template = self._build_command_template()
             subprocess.call(command_template.format(fasta_file=os.path.join(tmp_dir, 'tmp.fasta'),
                                                     outdir=tmp_dir).split())
-            for chain_name in st.sequence_by_chains.keys():
-                embeddings[chain_name] = next(
-                    iter(torch.load(os.path.join(tmp_dir, f"{chain_name}.pt"))["representations"].values())).numpy()
+            embeddings = self.load_data(tmp_dir, "tmp.pt")
         return embeddings
 
 
