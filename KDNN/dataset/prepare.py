@@ -42,7 +42,6 @@ class DimerStructure:
         self.st = gemmi.read_pdb(pdb_file, split_chain_on_ter=True)
         self.st.setup_entities()
         self._copy = self.st
-        self.pretrained_embeddings = None
 
     def iterate_over_atoms(self) -> Iterator[Tuple[gemmi.Model, gemmi.Chain, gemmi.Residue, gemmi.Atom]]:
         for model in self.st:
@@ -146,9 +145,11 @@ class DimerStructure:
         return self
 
     def pretrained_embedding(self,
-                             pretrained_model: "PretrainedModel"
+                             pretrained_model: "PretrainedModel",
+                             clip_terminal_tags=True
                              ):
-        _embeddings = pretrained_model.predict(self)
+        pretrained_embeddings = []
+        indexes_by_chains = self._get_model_idx_in_fasta()
         for chain in self.chains:
             if self.pretrained_embeddings is None:
                 self.pretrained_embeddings = _embeddings[chain.name]
