@@ -6,10 +6,9 @@ import torch.nn.functional as F
 from abc import abstractmethod
 from typing import Tuple, Union
 
-from torch import Tensor
 from torch.nn import ModuleList, Sequential, ReLU, Linear
 
-from torch_geometric.nn import GATConv, MetaLayer
+from torch_geometric.nn import GATConv, MetaLayer, GCNConv
 from torch_geometric.nn import BatchNorm, global_mean_pool
 
 
@@ -42,11 +41,9 @@ class EdgeConvLayer(nn.Module):
                  node_feature_dim,
                  edge_feature_dim_in,
                  edge_hidden_dim,
-                 edge_feature_dim_out,
-                 residuals
+                 edge_feature_dim_out
                  ):
         super().__init__()
-        self.residuals = residuals
         self.edge_mlp = nn.Sequential(
             nn.Linear(2 * node_feature_dim + edge_feature_dim_in, edge_hidden_dim),
             nn.ReLU(),
@@ -56,38 +53,25 @@ class EdgeConvLayer(nn.Module):
     def forward(self, src, dest, edge_attr, u=None, batch=None):
         out = torch.cat([src, dest, edge_attr], 1)
         out = self.edge_mlp(out)
-        if self.residuals:
-            out = out + edge_attr
         return out
 
 
-class KdModel(BaseModel):
+class KdModel_PoolEdges(BaseModel):
     def __init__(self,
                  node_feature_dim: Union[int, Tuple[int, int]],
                  node_embedding_dim: int,
                  edge_feature_dim: int,
                  num_layers: int = 4,
-                 heads: int = 1,
-                 concat: bool = False,
-                 negative_slope: float = 0.2,
-                 dropout: float = 0.0,
-                 add_self_loops: bool = True,
-                 fill_value: Union[float, Tensor, str] = 0,
-                 bias: bool = True,
-                 linear_layer_nodes: bool = True,
-                 linear_layer_edges: bool = True,
+                 linear_layer_nodes: bool = False,
+                 linear_layer_edges: bool = False,
                  batchnorm: bool = True,
-                 residuals_edges: bool = True,
-                 residuals_nodes: bool = False,
-                 **kwargs,
+                 **kwargs
                  ):
 
         super().__init__()
 
         self.num_layers = num_layers
         self.convs = ModuleList()
-        self.residuals_edges = residuals_edges
-        self.residuals_nodes = residuals_nodes
 
         self.linear_layer_nodes = ModuleList() if linear_layer_nodes else None
         self.linear_layer_edges = ModuleList() if linear_layer_edges else None
@@ -97,21 +81,11 @@ class KdModel(BaseModel):
             EdgeConvLayer(node_feature_dim=node_feature_dim,
                           edge_feature_dim_in=edge_feature_dim,
                           edge_hidden_dim=node_embedding_dim,
-                          edge_feature_dim_out=node_embedding_dim,
-                          residuals=self.residuals_edges),
+                          edge_feature_dim_out=node_embedding_dim),
             GATConv(in_channels=node_feature_dim,
                     out_channels=node_embedding_dim,
-                    concat=concat,
                     edge_dim=node_embedding_dim,
-                    heads=heads,
-                    negative_slope=negative_slope,
-                    dropout=dropout,
-                    add_self_loops=add_self_loops,
-                    fill_value=fill_value,
-                    bias=bias,
-                    **kwargs)
-
-        ))
+                    **kwargs)))
 
         for _ in range(self.num_layers - 1):
 
@@ -119,13 +93,11 @@ class KdModel(BaseModel):
                 EdgeConvLayer(node_feature_dim=node_embedding_dim,
                               edge_feature_dim_in=node_embedding_dim,
                               edge_hidden_dim=node_embedding_dim,
-                              edge_feature_dim_out=node_embedding_dim,
-                              residuals=self.residuals_edges),
+                              edge_feature_dim_out=node_embedding_dim),
                 GATConv(in_channels=node_embedding_dim,
                         out_channels=node_embedding_dim,
-                        concat=concat,
                         edge_dim=node_embedding_dim,
-                        fill_value=0))
+                        **kwargs))
 
             self.convs.append(meta)
             if linear_layer_nodes:
@@ -163,7 +135,9 @@ class KdModel(BaseModel):
                 if i < self.num_layers - 1:
                     edge_attr = F.relu(self.linear_layer_edges[i](edge_attr))
 
-            x = h + x if self.residuals_nodes else h
+            x = h
 
-        x = global_mean_pool(x, batch)
-        return self.mlp(x)
+        batch_edge = batch[edge_index[0]]
+        edge_attr = global_mean_pool(edge_attr, batch_edge)
+
+        return self.mlp(edge_attr)
