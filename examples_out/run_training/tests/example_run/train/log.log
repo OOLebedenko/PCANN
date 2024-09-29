@@ -1,0 +1,255 @@
+2024-09-29 18:11:56,318 - test - INFO - KdModel_PoolEdges(
+  (convs): ModuleList(
+    (0): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=2561, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(1280, 64, heads=1),
+      global_model=None
+    )
+    (1): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+    (2): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+  )
+  (batchnorms): ModuleList(
+    (0): BatchNorm(64)
+    (1): BatchNorm(64)
+  )
+  (mlp): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=32, bias=True)
+    (3): ReLU()
+    (4): Linear(in_features=32, out_features=1, bias=True)
+  )
+)
+Trainable parameters: 310849
+2024-09-29 18:11:56,353 - test - INFO - number - pdb_id - predicted - target - loss - mean_squared_relative_mse
+2024-09-29 18:11:56,508 - test - INFO - 1 - 1a22_wt - -0.08128929138183594 - -19.7116641998291 - 385.35162353515625 - 0.9917691349983215
+2024-09-29 18:14:44,594 - test - INFO - KdModel_PoolEdges(
+  (convs): ModuleList(
+    (0): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=2561, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(1280, 64, heads=1),
+      global_model=None
+    )
+    (1): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+    (2): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+  )
+  (batchnorms): ModuleList(
+    (0): BatchNorm(64)
+    (1): BatchNorm(64)
+  )
+  (mlp): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=32, bias=True)
+    (3): ReLU()
+    (4): Linear(in_features=32, out_features=1, bias=True)
+  )
+)
+Trainable parameters: 310849
+2024-09-29 18:14:44,632 - test - INFO - number - pdb_id - predicted - target - loss - mean_squared_relative_mse
+2024-09-29 18:14:44,788 - test - INFO - 1 - 1a22_wt - 0.08220638334751129 - -19.7116641998291 - 391.7973327636719 - 1.008358359336853
+2024-09-29 18:17:11,482 - test - INFO - KdModel_PoolEdges(
+  (convs): ModuleList(
+    (0): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=2561, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(1280, 64, heads=1),
+      global_model=None
+    )
+    (1): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+    (2): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+  )
+  (batchnorms): ModuleList(
+    (0): BatchNorm(64)
+    (1): BatchNorm(64)
+  )
+  (mlp): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=32, bias=True)
+    (3): ReLU()
+    (4): Linear(in_features=32, out_features=1, bias=True)
+  )
+)
+Trainable parameters: 310849
+2024-09-29 18:17:11,528 - test - INFO - number - pdb_id - predicted - target - loss - mean_squared_relative_mse
+2024-09-29 18:17:11,692 - test - INFO - 1 - 1a22_wt - 0.08220638334751129 - -19.7116641998291 - 391.7973327636719 - 1.008358359336853
+2024-09-29 18:22:09,302 - test - INFO - KdModel_PoolEdges(
+  (convs): ModuleList(
+    (0): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=2561, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(1280, 64, heads=1),
+      global_model=None
+    )
+    (1): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+    (2): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+  )
+  (batchnorms): ModuleList(
+    (0): BatchNorm(64)
+    (1): BatchNorm(64)
+  )
+  (mlp): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=32, bias=True)
+    (3): ReLU()
+    (4): Linear(in_features=32, out_features=1, bias=True)
+  )
+)
+Trainable parameters: 310849
+2024-09-29 18:22:09,341 - test - INFO - number - pdb_id - predicted - target - loss - mean_squared_relative_mse
+2024-09-29 18:22:09,499 - test - INFO - 1 - 1a22_wt - 0.08220638334751129 - -19.7116641998291 - 391.7973327636719 - 1.008358359336853
+2024-09-29 18:22:44,067 - test - INFO - KdModel_PoolEdges(
+  (convs): ModuleList(
+    (0): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=2561, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(1280, 64, heads=1),
+      global_model=None
+    )
+    (1): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+    (2): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+  )
+  (batchnorms): ModuleList(
+    (0): BatchNorm(64)
+    (1): BatchNorm(64)
+  )
+  (mlp): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=32, bias=True)
+    (3): ReLU()
+    (4): Linear(in_features=32, out_features=1, bias=True)
+  )
+)
+Trainable parameters: 310849
+2024-09-29 18:22:44,094 - test - INFO - number - pdb_id - predicted - target - loss - mean_squared_relative_mse
+2024-09-29 18:22:44,221 - test - INFO - 1 - 1a22_wt - 0.08220638334751129 - -19.7116641998291 - 391.7973327636719 - 1.008358359336853

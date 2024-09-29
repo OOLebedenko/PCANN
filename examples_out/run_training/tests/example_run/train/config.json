@@ -1,0 +1,102 @@
+{
+    "outdir": "example_run",
+    "device": "cpu",
+    "arch": {
+        "type": "KdModel_PoolEdges",
+        "args": {
+            "node_feature_dim": 1280,
+            "node_embedding_dim": 64,
+            "edge_feature_dim": 1,
+            "num_layers": 3,
+            "heads": 1,
+            "add_self_loops": false,
+            "concat": false,
+            "bias": true,
+            "batchnorm": true,
+            "linear_layer_nodes": false,
+            "linear_layer_edges": false
+        }
+    },
+    "pretrained_model": {
+        "type": "EsmPretrainedModel",
+        "args": {
+            "path_to_model_dir": "../../trained_models/ESM-2/esm-main",
+            "name": "esm2_t33_650M_UR50D"
+        }
+    },
+    "dataset_train": {
+        "type": "KdDataset",
+        "args": {
+            "root": "processed",
+            "path_to_pdb_dir": "pdb",
+            "path_to_target_csv": "log_kd_train.csv",
+            "pdb_fname_format": "{}.pdb1"
+        }
+    },
+    "dataset_valid": {
+        "type": "KdDataset",
+        "args": {
+            "root": "processed",
+            "path_to_pdb_dir": "pdb",
+            "path_to_target_csv": "log_kd_valid.csv",
+            "pdb_fname_format": "{}.pdb1"
+        }
+    },
+    "dataset_test": {
+        "type": "KdDataset",
+        "args": {
+            "root": "processed",
+            "path_to_pdb_dir": "pdb",
+            "path_to_target_csv": "log_kd_test.csv",
+            "pdb_fname_format": "{}.pdb1"
+        }
+    },
+    "dataset_transforms": {
+        "transform_1": {
+            "type": "InteractionGraph",
+            "args": {}
+        }
+    },
+    "dataloader": {
+        "type": "set_dataloaders",
+        "args": {
+            "batch_size": 64,
+            "num_workers": 2
+        }
+    },
+    "optimizer": {
+        "type": "Adam",
+        "args": {
+            "lr": 0.001,
+            "weight_decay": 0.001,
+            "amsgrad": true
+        }
+    },
+    "loss": {
+        "type": "mse_loss",
+        "args": {}
+    },
+    "metrics": {
+        "metric_1": {
+            "type": "mean_squared_relative_mse",
+            "args": {}
+        }
+    },
+    "lr_scheduler": {
+        "type": "ReduceLROnPlateau",
+        "args": {
+            "factor": 0.1,
+            "patience": 5
+        }
+    },
+    "trainer": {
+        "type": "Trainer",
+        "args": {
+            "epochs": 1,
+            "checkpoint_freq": 1,
+            "monitor": "min val_loss",
+            "early_stop": 6,
+            "tensorboard": true
+        }
+    }
+}
