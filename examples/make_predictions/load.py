@@ -5,8 +5,8 @@ import torch
 from torch_geometric.loader import DataLoader
 from tqdm import tqdm
 
-from KDNN.model import KdModel_PoolEdges
-from KDNN.dataset import KdDataset, EsmPretrainedModel, InteractionGraph
+from PCANN.model import KdModel_PoolEdges
+from PCANN.dataset import KdDataset, EsmPretrainedModel, InteractionGraph
 
 
 def load_models(path_to_checkpoint_dir,
@@ -114,7 +114,7 @@ if __name__ == '__main__':
 
     ## ENTER PATH TO DOWNLOADED ESM REPOSITORY 
     # This examples use the EsmPretrainedModel.
-    # Please, download code from github by using script: {YOUR_PATH}/KDNN/trained_models/ESM-2/download.sh
+    # Please, download code from github by using script: {YOUR_PATH}/PCANN/trained_models/ESM-2/download.sh
     path_to_esm_dir = "../../trained_models/ESM-2/esm-main"
 
     ## ENTER PATH TO PCANN CHECKOUT DIRECTORY
