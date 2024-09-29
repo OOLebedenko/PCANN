@@ -1,0 +1,384 @@
+2024-09-29 18:07:39,735 - train - INFO - KdDataset()
+2024-09-29 18:07:39,740 - train - INFO - KdDataset()
+2024-09-29 18:07:39,797 - train - INFO - KdModel_PoolEdges(
+  (convs): ModuleList(
+    (0): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=2561, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(1280, 64, heads=1),
+      global_model=None
+    )
+    (1): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+    (2): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+  )
+  (batchnorms): ModuleList(
+    (0): BatchNorm(64)
+    (1): BatchNorm(64)
+  )
+  (mlp): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=32, bias=True)
+    (3): ReLU()
+    (4): Linear(in_features=32, out_features=1, bias=True)
+  )
+)
+Trainable parameters: 310849
+2024-09-29 18:08:40,438 - train - INFO - KdDataset()
+2024-09-29 18:08:40,443 - train - INFO - KdDataset()
+2024-09-29 18:08:40,492 - train - INFO - KdModel_PoolEdges(
+  (convs): ModuleList(
+    (0): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=2561, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(1280, 64, heads=1),
+      global_model=None
+    )
+    (1): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+    (2): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+  )
+  (batchnorms): ModuleList(
+    (0): BatchNorm(64)
+    (1): BatchNorm(64)
+  )
+  (mlp): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=32, bias=True)
+    (3): ReLU()
+    (4): Linear(in_features=32, out_features=1, bias=True)
+  )
+)
+Trainable parameters: 310849
+2024-09-29 18:10:18,545 - train - INFO - KdDataset()
+2024-09-29 18:10:18,551 - train - INFO - KdDataset()
+2024-09-29 18:10:18,609 - train - INFO - KdModel_PoolEdges(
+  (convs): ModuleList(
+    (0): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=2561, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(1280, 64, heads=1),
+      global_model=None
+    )
+    (1): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+    (2): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+  )
+  (batchnorms): ModuleList(
+    (0): BatchNorm(64)
+    (1): BatchNorm(64)
+  )
+  (mlp): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=32, bias=True)
+    (3): ReLU()
+    (4): Linear(in_features=32, out_features=1, bias=True)
+  )
+)
+Trainable parameters: 310849
+2024-09-29 18:10:50,694 - train - INFO - KdDataset()
+2024-09-29 18:10:50,696 - train - INFO - KdDataset()
+2024-09-29 18:10:50,734 - train - INFO - KdModel_PoolEdges(
+  (convs): ModuleList(
+    (0): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=2561, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(1280, 64, heads=1),
+      global_model=None
+    )
+    (1): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+    (2): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+  )
+  (batchnorms): ModuleList(
+    (0): BatchNorm(64)
+    (1): BatchNorm(64)
+  )
+  (mlp): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=32, bias=True)
+    (3): ReLU()
+    (4): Linear(in_features=32, out_features=1, bias=True)
+  )
+)
+Trainable parameters: 310849
+2024-09-29 18:11:17,918 - train - INFO - KdDataset()
+2024-09-29 18:11:17,922 - train - INFO - KdDataset()
+2024-09-29 18:11:17,966 - train - INFO - KdModel_PoolEdges(
+  (convs): ModuleList(
+    (0): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=2561, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(1280, 64, heads=1),
+      global_model=None
+    )
+    (1): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+    (2): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+  )
+  (batchnorms): ModuleList(
+    (0): BatchNorm(64)
+    (1): BatchNorm(64)
+  )
+  (mlp): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=32, bias=True)
+    (3): ReLU()
+    (4): Linear(in_features=32, out_features=1, bias=True)
+  )
+)
+Trainable parameters: 310849
+2024-09-29 18:11:20,553 - KDNN.trainer.trainer - INFO -     epoch          : 1
+2024-09-29 18:11:20,555 - KDNN.trainer.trainer - INFO -     lr             : 0.001
+2024-09-29 18:11:20,557 - KDNN.trainer.trainer - INFO -     loss           : 395.06573486328125
+2024-09-29 18:11:20,559 - KDNN.trainer.trainer - INFO -     mean_squared_relative_mse: 1.0167701244354248
+2024-09-29 18:11:20,755 - KDNN.trainer.trainer - INFO -     val_epoch      : 1
+2024-09-29 18:11:20,756 - KDNN.trainer.trainer - INFO -     val_loss       : 505.3104248046875
+2024-09-29 18:11:20,757 - KDNN.trainer.trainer - INFO -     val_mean_squared_relative_mse: 1.01315438747406
+2024-09-29 18:11:20,865 - KDNN.trainer.trainer - INFO - Saving checkpoint: experiments/example_run/checkpoint/checkpoint-epoch1.pth ...
+2024-09-29 18:11:20,959 - KDNN.trainer.trainer - INFO - Saving current best: model_best.pth ...
+2024-09-29 18:11:46,411 - train - INFO - KdDataset()
+2024-09-29 18:11:46,414 - train - INFO - KdDataset()
+2024-09-29 18:11:46,460 - train - INFO - KdModel_PoolEdges(
+  (convs): ModuleList(
+    (0): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=2561, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(1280, 64, heads=1),
+      global_model=None
+    )
+    (1): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+    (2): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+  )
+  (batchnorms): ModuleList(
+    (0): BatchNorm(64)
+    (1): BatchNorm(64)
+  )
+  (mlp): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=32, bias=True)
+    (3): ReLU()
+    (4): Linear(in_features=32, out_features=1, bias=True)
+  )
+)
+Trainable parameters: 310849
+2024-09-29 18:11:48,784 - KDNN.trainer.trainer - INFO -     epoch          : 1
+2024-09-29 18:11:48,786 - KDNN.trainer.trainer - INFO -     lr             : 0.001
+2024-09-29 18:11:48,787 - KDNN.trainer.trainer - INFO -     loss           : 385.90155029296875
+2024-09-29 18:11:48,789 - KDNN.trainer.trainer - INFO -     mean_squared_relative_mse: 0.993184506893158
+2024-09-29 18:11:48,945 - KDNN.trainer.trainer - INFO -     val_epoch      : 1
+2024-09-29 18:11:48,946 - KDNN.trainer.trainer - INFO -     val_loss       : 495.2353210449219
+2024-09-29 18:11:48,948 - KDNN.trainer.trainer - INFO -     val_mean_squared_relative_mse: 0.9929536581039429
+2024-09-29 18:11:49,029 - KDNN.trainer.trainer - INFO - Saving checkpoint: experiments/example_run/checkpoint/checkpoint-epoch1.pth ...
+2024-09-29 18:11:49,115 - KDNN.trainer.trainer - INFO - Saving current best: model_best.pth ...
+2024-09-29 18:14:28,133 - train - INFO - KdDataset()
+2024-09-29 18:14:28,139 - train - INFO - KdDataset()
+2024-09-29 18:14:28,190 - train - INFO - KdModel_PoolEdges(
+  (convs): ModuleList(
+    (0): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=2561, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(1280, 64, heads=1),
+      global_model=None
+    )
+    (1): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+    (2): MetaLayer(
+      edge_model=EdgeConvLayer(
+      (edge_mlp): Sequential(
+        (0): Linear(in_features=192, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    ),
+      node_model=GATConv(64, 64, heads=1),
+      global_model=None
+    )
+  )
+  (batchnorms): ModuleList(
+    (0): BatchNorm(64)
+    (1): BatchNorm(64)
+  )
+  (mlp): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=32, bias=True)
+    (3): ReLU()
+    (4): Linear(in_features=32, out_features=1, bias=True)
+  )
+)
+Trainable parameters: 310849
+2024-09-29 18:14:30,522 - KDNN.trainer.trainer - INFO -     epoch          : 1
+2024-09-29 18:14:30,523 - KDNN.trainer.trainer - INFO -     lr             : 0.001
+2024-09-29 18:14:30,524 - KDNN.trainer.trainer - INFO -     loss           : 392.3365478515625
+2024-09-29 18:14:30,525 - KDNN.trainer.trainer - INFO -     mean_squared_relative_mse: 1.0097460746765137
+2024-09-29 18:14:30,690 - KDNN.trainer.trainer - INFO -     val_epoch      : 1
+2024-09-29 18:14:30,691 - KDNN.trainer.trainer - INFO -     val_loss       : 502.5188903808594
+2024-09-29 18:14:30,693 - KDNN.trainer.trainer - INFO -     val_mean_squared_relative_mse: 1.0075572729110718
+2024-09-29 18:14:30,832 - KDNN.trainer.trainer - INFO - Saving checkpoint: experiments/example_run/checkpoint/checkpoint-epoch1.pth ...
+2024-09-29 18:14:30,925 - KDNN.trainer.trainer - INFO - Saving current best: model_best.pth ...
