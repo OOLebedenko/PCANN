@@ -48,7 +48,7 @@ class KdDataset(Dataset):
 
     @property
     def raw_dir(self) -> str:
-        return os.path.join(self.root, self.raw_dirname)
+        return self.raw_dirname
 
     @property
     def raw_file_names(self) -> List[str]:
