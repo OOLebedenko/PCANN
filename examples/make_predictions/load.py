@@ -84,7 +84,7 @@ def make_prediction(dataset,
     with torch.no_grad():
         for batch_idx, data in enumerate(tqdm(test_loader)):
 
-            data, target = data.to(device), data.target.to(device)
+            data = data.to(device)
             predictions = []
             pdb_id = data.label[0]
             for model in tqdm(models, desc="make_predictions"):

@@ -8,7 +8,7 @@ from typing import Tuple, Union
 
 from torch.nn import ModuleList, Sequential, ReLU, Linear
 
-from torch_geometric.nn import GATConv, MetaLayer, GCNConv
+from torch_geometric.nn import GATConv, MetaLayer
 from torch_geometric.nn import BatchNorm, global_mean_pool
 
 

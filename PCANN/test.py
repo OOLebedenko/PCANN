@@ -31,12 +31,12 @@ def run_testing(run_setup: SetupRun,
     pretrained_model = run_setup.init_obj("pretrained_model", module_dataset)
 
     dataset_transforms = T.Compose([run_setup.init_obj(transform, module_transform)
-                                        for transform in run_setup['dataset_transforms']])
+                                    for transform in run_setup['dataset_transforms']])
     dataset = run_setup.init_obj(name=f'dataset_{dataset_type}',
                                  module=module_dataset,
                                  pretrained_model=pretrained_model,
                                  transform=dataset_transforms
-                                )
+                                 )
     # setup data_loader instances
     test_loader = DataLoader(dataset=dataset, batch_size=1)
 
