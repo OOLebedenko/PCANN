@@ -2,6 +2,10 @@
 
 # PCANN - Protein Complex Affinity Neural Network
 
+<p align="center">
+  <img src="figures/nn.png">
+</p>
+
 This repository contains the scripts, trained models and sample data for protein complex affinity prediction based on its 3D-coordinates.
 We trained 25 different models and provided the final result as average over predicitions of these models.
 
